@@ -1,6 +1,8 @@
 import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
+
 
 def basic_eda(df: pd.DataFrame, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)

@@ -1,6 +1,8 @@
-import os
 import json
+import os
+
 import joblib
+
 
 def checkout_commit(mlvern_dir, commit_id):
     commit_path = os.path.join(mlvern_dir, "commits", commit_id)

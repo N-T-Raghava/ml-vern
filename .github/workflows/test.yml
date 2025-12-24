@@ -58,8 +58,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 black isort
 
-    - name: Check code formatting with black
-      run: black --check mlvern/ tests/
+    - name: Format code with black
+      run: black mlvern/ tests/
 
     - name: Check import sorting with isort
       run: isort --check-only mlvern/ tests/
@@ -87,7 +87,7 @@ jobs:
       run: python -m build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist/

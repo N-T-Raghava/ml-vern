@@ -1,13 +1,17 @@
-import os
 import json
-import joblib
+import os
 from datetime import datetime
+
+import joblib
+
 from mlvern.utils.hashing import hash_object
+
 
 def _next_commit_id(commits_dir):
     os.makedirs(commits_dir, exist_ok=True)
     existing = sorted(os.listdir(commits_dir))
     return f"{len(existing)+1:04d}"
+
 
 def commit_run(mlvern_dir, message, model, metrics, params):
     commits_dir = os.path.join(mlvern_dir, "commits")
@@ -30,13 +34,14 @@ def commit_run(mlvern_dir, message, model, metrics, params):
         "message": message,
         "timestamp": datetime.utcnow().isoformat(),
         "params_hash": hash_object(params),
-        "metrics_hash": hash_object(metrics)
+        "metrics_hash": hash_object(metrics),
     }
 
     with open(f"{commit_path}/meta.json", "w") as f:
         json.dump(meta, f, indent=4)
 
     return cid
+
 
 def log_commits(mlvern_dir):
     commits_dir = os.path.join(mlvern_dir, "commits")

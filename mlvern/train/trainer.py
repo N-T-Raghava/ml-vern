@@ -1,5 +1,6 @@
 from sklearn.metrics import accuracy_score
 
+
 def train_model(model, X_train, y_train, X_val=None, y_val=None):
     model.fit(X_train, y_train)
 
