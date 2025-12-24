@@ -1,3 +1,4 @@
+import os
 import json
 import pandas as pd
 
@@ -12,7 +13,10 @@ def inspect_data(df: pd.DataFrame, target: str, mlvern_dir: str):
     else:
         report["error"] = f"Target column '{target}' not found"
 
-    path = f"{mlvern_dir}/reports/data_inspection.json"
+    reports_dir = os.path.join(mlvern_dir, "reports")
+    os.makedirs(reports_dir, exist_ok=True)
+
+    path = os.path.join(reports_dir, "data_inspection.json")
     with open(path, "w") as f:
         json.dump(report, f, indent=4)
 

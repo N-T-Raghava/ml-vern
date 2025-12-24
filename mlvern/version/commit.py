@@ -4,11 +4,13 @@ import joblib
 from datetime import datetime
 
 def _next_commit_id(commits_dir):
+    os.makedirs(commits_dir, exist_ok=True)
     existing = sorted(os.listdir(commits_dir))
     return f"{len(existing)+1:04d}"
 
 def commit_run(mlvern_dir, message, model, metrics, params):
     commits_dir = os.path.join(mlvern_dir, "commits")
+    os.makedirs(commits_dir, exist_ok=True)
     cid = _next_commit_id(commits_dir)
 
     commit_path = os.path.join(commits_dir, cid)
