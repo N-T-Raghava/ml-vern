@@ -30,8 +30,7 @@ jobs:
         pip install -e ".[dev]"
 
     - name: Run tests with pytest
-      run: |
-        pytest tests/ -v --tb=short
+      run: pytest tests/ -v --tb=short
 
     - name: Generate coverage report
       run: |
@@ -61,10 +60,10 @@ jobs:
         pip install flake8 black isort
 
     - name: Format code with black
-      run: black mlvern/ tests/
+      run: black --check mlvern/ tests/
 
-    - name: Format imports with isort
-      run: isort mlvern/ tests/
+    - name: Check import sorting with isort
+      run: isort --check-only mlvern/ tests/
 
     - name: Lint with flake8
       run: flake8 mlvern/ tests/ --max-line-length=100
@@ -98,13 +97,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+
     steps:
     - uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
 
     - name: Download artifacts
       uses: actions/download-artifact@v4
@@ -116,3 +111,10 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
