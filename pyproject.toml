@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlvern"
-version = "0.1.4"
+version = "0.1.6"
 description = "Local-first ML pipeline automation with versioning"
 authors = [{name="Your Name"}]
 readme = "README.md"
