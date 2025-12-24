@@ -2,6 +2,7 @@ import os
 import json
 import joblib
 from datetime import datetime
+from mlvern.utils.hashing import hash_object
 
 def _next_commit_id(commits_dir):
     os.makedirs(commits_dir, exist_ok=True)
@@ -27,7 +28,9 @@ def commit_run(mlvern_dir, message, model, metrics, params):
     meta = {
         "id": cid,
         "message": message,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "params_hash": hash_object(params),
+        "metrics_hash": hash_object(metrics)
     }
 
     with open(f"{commit_path}/meta.json", "w") as f:
