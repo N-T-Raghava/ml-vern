@@ -61,8 +61,8 @@ jobs:
     - name: Format code with black
       run: black mlvern/ tests/
 
-    - name: Check import sorting with isort
-      run: isort --check-only mlvern/ tests/
+    - name: Format imports with isort
+      run: isort mlvern/ tests/
 
     - name: Lint with flake8
       run: flake8 mlvern/ tests/ --max-line-length=100

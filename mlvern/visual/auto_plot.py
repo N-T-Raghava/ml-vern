@@ -1,10 +1,13 @@
 import os
 
 import matplotlib.pyplot as plt
-from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.metrics import RocCurveDisplay
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_curve
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    RocCurveDisplay,
+    confusion_matrix,
+    roc_curve,
+)
+
 
 def auto_plot(task, y_true=None, y_pred=None, y_prob=None, output_dir="."):
     os.makedirs(output_dir, exist_ok=True)
