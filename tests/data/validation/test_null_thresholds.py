@@ -1,0 +1,10 @@
+from mlvern.data.inspect import DataInspector
+import pandas as pd
+
+
+def test_null_thresholds():
+    df = pd.DataFrame({"a": [None, None, 1, None]})
+    inspector = DataInspector(df)
+    res = inspector._validate_null_thresholds()
+    assert not res["is_valid"]
+    assert "a" in res["violations"]
