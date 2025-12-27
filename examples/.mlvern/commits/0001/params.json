@@ -1,5 +1,0 @@
-{
-    "model": "RandomForestClassifier",
-    "n_estimators": 10,
-    "random_state": 42
-}
