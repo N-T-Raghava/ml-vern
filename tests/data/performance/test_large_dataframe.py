@@ -1,3 +1,11 @@
+def test_large_dataframe_performance(stats_module):
+    import pandas as pd
+
+    n = 20000
+    df = pd.DataFrame({"a": range(n), "b": range(n)})
+    # run a moderately expensive operation
+    v = stats_module.vif(df)
+    assert isinstance(v, dict)
 from mlvern.data.inspect import inspect_data
 import pandas as pd
 

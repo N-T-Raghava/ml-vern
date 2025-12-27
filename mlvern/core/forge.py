@@ -1,6 +1,9 @@
 import os
+from typing import Optional
 
 from mlvern.data.inspect import inspect_data
+from mlvern.data.statistics import compute_statistics
+from mlvern.data.risk_check import run_risk_checks
 from mlvern.train.trainer import train_model
 from mlvern.version.checkout import checkout_commit
 from mlvern.version.commit import commit_run, log_commits
@@ -22,6 +25,15 @@ class Forge:
 
     def inspect(self, data, target: str):
         return inspect_data(data, target, self.mlvern_dir)
+
+    def statistics(self, data, target: Optional[str] = None):
+        """Run statistical analyses and return a structured report."""
+        return compute_statistics(data, target)
+
+    def risk_check(self, data, target: Optional[str] = None, sensitive: Optional[list] = None, baseline=None, train=None, test=None):
+        """Run risk checks (imbalance, leakage, drift, mismatch)."""
+        return run_risk_checks(data, target=target, sensitive=sensitive,
+                               baseline=baseline, train=train, test=test)
 
     def plot(self, task: str, y_true=None, y_pred=None, y_prob=None):
         auto_plot(
