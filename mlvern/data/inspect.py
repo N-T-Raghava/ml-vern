@@ -1,15 +1,16 @@
 import json
 import os
 from datetime import datetime, timezone
+from typing import Any
 
 import pandas as pd
 
 
-def inspect_data(df: pd.DataFrame, target: str, mlvern_dir: str):
+def inspect_data(df: pd.DataFrame, target: str, mlvern_dir: str) -> dict[str, Any]:
     if df.empty:
         raise ValueError("Dataset is empty")
 
-    report = {
+    report: dict[str, Any] = {
         "metadata": {
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "library": "mlvern",
