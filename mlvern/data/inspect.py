@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 
@@ -11,7 +11,7 @@ def inspect_data(df: pd.DataFrame, target: str, mlvern_dir: str):
 
     report = {
         "metadata": {
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "library": "mlvern",
             "version": "0.1.0",
         },

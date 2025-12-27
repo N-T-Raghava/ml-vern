@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import joblib
 
@@ -32,7 +32,7 @@ def commit_run(mlvern_dir, message, model, metrics, params):
     meta = {
         "id": cid,
         "message": message,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "params_hash": hash_object(params),
         "metrics_hash": hash_object(metrics),
     }

@@ -12,5 +12,8 @@ def test_data_inspection_creates_report():
     with tempfile.TemporaryDirectory() as tmp:
         report = inspect_data(df, "y", tmp)
 
-        assert "missing_values" in report
-        assert os.path.exists(f"{tmp}/reports/data_inspection.json")
+        assert "statistics" in report
+        assert "missing_values" in report["statistics"]
+        assert os.path.exists(
+            f"{tmp}/reports/data_validation_report.json"
+        )
