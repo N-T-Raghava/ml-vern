@@ -19,7 +19,7 @@ def test_numeric_ranges_available_two_rows():
     df = pd.DataFrame({"x": [1.0, 2.0], "y": [3.0, 4.0]})
     inspector = DataInspector(df)
     result = inspector._profile_numeric_ranges()
-    assert "status" not in result  
+    assert "status" not in result
     assert "x" in result
     assert "std" in result["x"]
 
@@ -48,7 +48,7 @@ def test_full_inspection_explicit_skip_status():
     df = pd.DataFrame({"x": [1.0], "target": [0]})
     inspector = DataInspector(df, target="target")
     report = inspector.inspect()
-    
+
     # numeric_ranges should be skipped
     assert report["part_1_profiling"]["numeric_ranges"]["status"] == "skipped"
     # outliers should be skipped

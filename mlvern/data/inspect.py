@@ -1,17 +1,15 @@
 import json
-import os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
 
 import pandas as pd
 import numpy as np
-from scipy import stats
 
 
 class DataInspector:
     """Comprehensive data profiling and validation framework."""
-    
+
     def __init__(self, df: pd.DataFrame, target: str = None, mlvern_dir: str = "."):
         self.df = df
         self.target = target
@@ -26,7 +24,7 @@ class DataInspector:
 
     def safe_numeric_profile(self, min_rows: int = 2) -> dict[str, Any]:
         """Check if dataset is large enough for numeric profiling.
-        
+
         Returns analysis or explicit skip status.
         """
         n_rows = len(self.df)
@@ -90,14 +88,14 @@ class DataInspector:
         """Profile missing values with patterns."""
         missing = self.df.isnull().sum()
         missing_pct = (missing / len(self.df) * 100).round(2)
-        
+
         result = {}
         for col in missing[missing > 0].index:
             result[col] = {
                 "count": int(missing[col]),
                 "percentage": float(missing_pct[col]),
             }
-        
+
         return {
             "total_missing": int(missing.sum()),
             "columns_affected": int((missing > 0).sum()),
@@ -107,21 +105,21 @@ class DataInspector:
     def _profile_duplicates(self) -> dict[str, Any]:
         """Profile duplicate rows."""
         total_dups = int(self.df.duplicated().sum())
-        
+
         dup_info = {"total": total_dups}
         if total_dups > 0:
             dup_info["percentage"] = round(total_dups / len(self.df) * 100, 2)
             # Check duplicates by subset
             dup_subset = self.df.duplicated(subset=self.df.columns[:-1], keep=False).sum()
             dup_info["by_features"] = int(dup_subset)
-        
+
         return dup_info
 
     def _profile_cardinality(self) -> dict[str, Any]:
         """Profile cardinality of categorical features."""
         cardinality = {}
         categorical_cols = self.df.select_dtypes(exclude="number").columns
-        
+
         for col in categorical_cols:
             unique_count = int(self.df[col].nunique())
             cardinality[col] = {
@@ -129,28 +127,26 @@ class DataInspector:
                 "cardinality_ratio": round(unique_count / len(self.df), 4),
                 "top_values": self.df[col].value_counts().head(5).to_dict(),
             }
-        
+
         return cardinality
 
     def _profile_numeric_ranges(self) -> dict[str, Any]:
-        """Profile ranges and statistics of numeric features.
-        
-        Skips if <2 rows (insufficient for variance computation).
-        """
+        """Profile ranges and statistics of numeric features."""
+
         check = self.safe_numeric_profile(min_rows=2)
         if check["status"] == "skipped":
             return check
-        
+
         numeric_cols = self.df.select_dtypes(include="number").columns
         ranges = {}
-        
+
         for col in numeric_cols:
             # Use ddof=0 to avoid division-by-zero warnings
             with np.errstate(divide='ignore', invalid='ignore'):
                 std_val = float(self.df[col].std(ddof=0))
                 if pd.isna(std_val):
                     std_val = 0.0
-            
+
             ranges[col] = {
                 "min": float(self.df[col].min()),
                 "max": float(self.df[col].max()),
@@ -160,32 +156,32 @@ class DataInspector:
                 "q25": float(self.df[col].quantile(0.25)),
                 "q75": float(self.df[col].quantile(0.75)),
             }
-        
+
         return ranges
 
     def _profile_outliers(self) -> dict[str, Any]:
         """Detect outliers using IQR method.
-        
+
         Skips if <5 rows (insufficient for reliable outlier detection).
         """
         check = self.safe_numeric_profile(min_rows=5)
         if check["status"] == "skipped":
             return check
-        
+
         numeric_cols = self.df.select_dtypes(include="number").columns
         outliers = {}
-        
+
         for col in numeric_cols:
             Q1 = self.df[col].quantile(0.25)
             Q3 = self.df[col].quantile(0.75)
             IQR = Q3 - Q1
             lower_bound = Q1 - 1.5 * IQR
             upper_bound = Q3 + 1.5 * IQR
-            
+
             outlier_count = int(
                 ((self.df[col] < lower_bound) | (self.df[col] > upper_bound)).sum()
             )
-            
+
             if outlier_count > 0:
                 outliers[col] = {
                     "count": outlier_count,
@@ -193,24 +189,24 @@ class DataInspector:
                     "lower_bound": float(lower_bound),
                     "upper_bound": float(upper_bound),
                 }
-        
+
         return outliers
 
     def _profile_target(self) -> dict[str, Any]:
         """Profile target variable distribution."""
         if self.target not in self.df.columns:
             return {"error": f"Target '{self.target}' not found"}
-        
+
         target_col = self.df[self.target]
         class_dist = target_col.value_counts().to_dict()
-        
+
         if len(class_dist) == 0:
             return {}
-        
+
         max_class = max(class_dist.values())
         min_class = min(class_dist.values())
         imbalance_ratio = round(max_class / max(min_class, 1), 2)
-        
+
         return {
             "target": self.target,
             "type": "categorical" if target_col.dtype == "object" else "numeric",
@@ -222,15 +218,15 @@ class DataInspector:
     def _validate_schema(self) -> dict[str, Any]:
         """Validate schema consistency."""
         issues = []
-        
+
         # Check for unnamed columns
         if self.df.columns.isnull().any():
             issues.append("Dataset has unnamed columns")
-        
+
         # Check for duplicate column names
         if self.df.columns.duplicated().any():
             issues.append("Dataset has duplicate column names")
-        
+
         return {
             "is_valid": len(issues) == 0,
             "issues": issues,
@@ -240,7 +236,7 @@ class DataInspector:
         """Validate value ranges."""
         violations = {}
         numeric_cols = self.df.select_dtypes(include="number").columns
-        
+
         for col in numeric_cols:
             # Check for inf values
             inf_count = int(np.isinf(self.df[col]).sum())
@@ -249,7 +245,7 @@ class DataInspector:
                     "type": "infinite_values",
                     "count": inf_count,
                 }
-        
+
         return {
             "is_valid": len(violations) == 0,
             "violations": violations,
@@ -259,14 +255,14 @@ class DataInspector:
         """Validate null value thresholds (default: 50%)."""
         threshold = 0.5
         violations = {}
-        
+
         missing_pct = (self.df.isnull().sum() / len(self.df) * 100)
         for col in missing_pct[missing_pct >= threshold * 100].index:
             violations[col] = {
                 "missing_percentage": float(missing_pct[col]),
                 "threshold": threshold * 100,
             }
-        
+
         return {
             "is_valid": len(violations) == 0,
             "threshold_percent": threshold * 100,
@@ -276,10 +272,10 @@ class DataInspector:
     def _validate_type_consistency(self) -> dict[str, Any]:
         """Validate type consistency across columns."""
         issues = {}
-        
+
         for col in self.df.columns:
             col_dtype = str(self.df[col].dtype)
-            
+
             # Check for mixed types in object columns
             if col_dtype == "object":
                 types_in_col = self.df[col].apply(lambda x: type(x).__name__).unique()
@@ -288,7 +284,7 @@ class DataInspector:
                         "types_found": list(types_in_col),
                         "message": "Mixed types detected",
                     }
-        
+
         return {
             "is_valid": len(issues) == 0,
             "issues": issues,
@@ -297,7 +293,7 @@ class DataInspector:
     def _validate_leakage(self) -> dict[str, Any]:
         """Check for potential data leakage patterns."""
         leakage_indicators = []
-        
+
         # Correlation requires >= 2 rows
         if len(self.df) < 2:
             return {
@@ -306,7 +302,7 @@ class DataInspector:
                 "status": "skipped",
                 "reason": "insufficient_rows",
             }
-        
+
         if self.target and self.target in self.df.columns:
             # Check for perfect correlations with target
             numeric_cols = self.df.select_dtypes(include="number").columns
@@ -320,7 +316,7 @@ class DataInspector:
                                 "correlation": float(corr),
                                 "message": "Perfect correlation with target",
                             })
-        
+
         return {
             "has_leakage_risk": len(leakage_indicators) > 0,
             "indicators": leakage_indicators,
@@ -380,7 +376,7 @@ class DataInspector:
             "vulnerabilities": [],
             "recommendations": [],
         }
-        
+
         self._assess_vulnerabilities()
         return self.report
 
@@ -388,7 +384,7 @@ class DataInspector:
         """Assess vulnerabilities and generate recommendations."""
         profile = self.report["part_1_profiling"]
         validation = self.report["part_2_validation"]
-        
+
         # Check missing values
         if profile["missing_values"]["total_missing"] > 0:
             self.report["vulnerabilities"].append({
@@ -396,10 +392,12 @@ class DataInspector:
                 "type": "MISSING_VALUES",
                 "message": f"{profile['missing_values']['total_missing']} missing values detected",
             })
-            self.report["recommendations"].append(
-                "Consider imputing missing values using mean, median, or KNN imputation"
+            msg = (
+                "Consider imputing missing values using mean, "
+                "median, or KNN imputation"
             )
-        
+            self.report["recommendations"].append(msg)
+
         # Check duplicates
         if profile["duplicates"]["total"] > 0:
             self.report["vulnerabilities"].append({
@@ -410,7 +408,7 @@ class DataInspector:
             self.report["recommendations"].append(
                 "Consider removing or investigating duplicate rows"
             )
-        
+
         # Check target
         if self.target and self.target in self.df.columns:
             target_dist = profile["target_distribution"]
@@ -421,9 +419,9 @@ class DataInspector:
                     "message": f"Imbalance ratio is {target_dist['imbalance_ratio']}",
                 })
                 self.report["recommendations"].append(
-                    "Use SMOTE, class weighting, or resampling to handle class imbalance"
+                    "Use SMOTE, class weighting, or resampling for class imbalance"
                 )
-        
+
         # Check null thresholds
         if not validation["null_thresholds"]["is_valid"]:
             self.report["vulnerabilities"].append({
@@ -434,7 +432,7 @@ class DataInspector:
             self.report["recommendations"].append(
                 "Consider dropping or heavily imputing columns with >50% missing values"
             )
-        
+
         # Check leakage
         if validation["leakage_checks"]["has_leakage_risk"]:
             self.report["vulnerabilities"].append({

@@ -1,5 +1,4 @@
 from mlvern.data.inspect import DataInspector
-import pandas as pd
 
 
 def test_profile_target(target_df):
