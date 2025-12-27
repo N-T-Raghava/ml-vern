@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def test_target_leakage_detects_copy(risk_module, risk_df):
     df = risk_df.copy()
     # create an obvious leakage column
