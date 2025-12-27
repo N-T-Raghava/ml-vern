@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 import numpy as np
@@ -10,11 +10,16 @@ import numpy as np
 class DataInspector:
     """Comprehensive data profiling and validation framework."""
 
-    def __init__(self, df: pd.DataFrame, target: str = None, mlvern_dir: str = "."):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        target: Optional[str] = None,
+        mlvern_dir: str = ".",
+    ):
         self.df = df
         self.target = target
         self.mlvern_dir = mlvern_dir
-        self.report = {}
+        self.report: dict[str, Any] = {}
 
     def validate_input(self) -> bool:
         """Validate input data."""
@@ -106,12 +111,14 @@ class DataInspector:
         """Profile duplicate rows."""
         total_dups = int(self.df.duplicated().sum())
 
-        dup_info = {"total": total_dups}
+        dup_info: dict[str, Any] = {"total": total_dups}
         if total_dups > 0:
             dup_info["percentage"] = round(total_dups / len(self.df) * 100, 2)
             # Check duplicates by subset
-            dup_subset = self.df.duplicated(subset=self.df.columns[:-1], keep=False).sum()
-            dup_info["by_features"] = int(dup_subset)
+            dup_subset = int(
+                self.df.duplicated(subset=self.df.columns[:-1], keep=False).sum()
+            )
+            dup_info["by_features"] = dup_subset
 
         return dup_info
 
@@ -387,14 +394,15 @@ class DataInspector:
 
         # Check missing values
         if profile["missing_values"]["total_missing"] > 0:
+            missing_count = profile["missing_values"]["total_missing"]
             self.report["vulnerabilities"].append({
                 "severity": "WARNING",
                 "type": "MISSING_VALUES",
-                "message": f"{profile['missing_values']['total_missing']} missing values detected",
+                "message": f"{missing_count} missing values detected",
             })
             msg = (
-                "Consider imputing missing values using mean, "
-                "median, or KNN imputation"
+                "Consider imputing missing values using mean, median, "
+                "or KNN imputation"
             )
             self.report["recommendations"].append(msg)
 
@@ -455,7 +463,11 @@ class DataInspector:
         return path
 
 
-def inspect_data(df: pd.DataFrame, target: str = None, mlvern_dir: str = ".") -> dict[str, Any]:
+def inspect_data(
+    df: pd.DataFrame,
+    target: Optional[str] = None,
+    mlvern_dir: str = ".",
+) -> dict[str, Any]:
     """Convenience function for data inspection."""
     inspector = DataInspector(df, target, mlvern_dir)
     report = inspector.inspect()
