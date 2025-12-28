@@ -28,6 +28,10 @@ def main():
     # Run risk checks
     risk_report = forge.risk_check(df, target=target, sensitive=['sepal width (cm)'], baseline=X_train, train=X_train, test=X_test)
     print("Risk Check Report:", risk_report)
+    
+    plots = forge.eda(df, target=target)
+    print("EDA Plots Generated:", plots)
+    
 
 if __name__ == "__main__":
     main()
