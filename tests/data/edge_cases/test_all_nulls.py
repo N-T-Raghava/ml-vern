@@ -1,6 +1,6 @@
 def test_all_nulls_detection(stats_module):
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 
     # use numeric NaNs so pandas treats columns as numeric
     df = pd.DataFrame({"a": [np.nan, np.nan], "b": [np.nan, np.nan]})

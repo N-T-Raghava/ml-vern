@@ -1,5 +1,6 @@
-from mlvern.data.inspect import DataInspector
 import pandas as pd
+
+from mlvern.data.inspect import DataInspector
 
 
 def test_custom_save_report(tmp_path):

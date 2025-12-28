@@ -1,6 +1,7 @@
 """Test explicit skip behavior for insufficient rows."""
-from mlvern.data.inspect import DataInspector
 import pandas as pd
+
+from mlvern.data.inspect import DataInspector
 
 
 def test_numeric_ranges_skipped_single_row():

@@ -1,6 +1,8 @@
 import json
-from mlvern.data.inspect import inspect_data
+
 import pandas as pd
+
+from mlvern.data.inspect import inspect_data
 
 
 def test_report_saved_and_json(tmp_path):

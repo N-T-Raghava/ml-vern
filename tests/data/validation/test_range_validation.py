@@ -1,6 +1,7 @@
 import numpy as np
-from mlvern.data.inspect import DataInspector
 import pandas as pd
+
+from mlvern.data.inspect import DataInspector
 
 
 def test_infinite_values():

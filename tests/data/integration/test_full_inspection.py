@@ -1,5 +1,6 @@
-from mlvern.data.inspect import inspect_data
 import pandas as pd
+
+from mlvern.data.inspect import inspect_data
 
 
 def test_full_inspection(tmp_path):
