@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 import pandas as pd
@@ -45,7 +44,8 @@ def no_numeric_columns():
 
 @pytest.fixture
 def mlvern_dir(tmp_path: Path):
-    # create a .mlvern directory inside the tmp workspace (simulates examples/.mlvern)
+    # create a .mlvern directory inside the tmp workspace
+    # (simulates examples/.mlvern)
     root = tmp_path
     mlvern = root / ".mlvern"
     mlvern.mkdir()
@@ -60,6 +60,11 @@ def run_eda(mlvern_dir):
     from mlvern.visual.eda import basic_eda
 
     def _run(df, target=None):
-        return basic_eda(df, output_dir="ignored", mlvern_dir=mlvern_dir, target=target)
+        return basic_eda(
+            df,
+            output_dir="ignored",
+            mlvern_dir=mlvern_dir,
+            target=target,
+        )
 
     return _run
