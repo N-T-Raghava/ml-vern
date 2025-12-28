@@ -1,5 +1,7 @@
+import shutil
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -68,3 +70,50 @@ def run_eda(mlvern_dir):
         )
 
     return _run
+
+
+@pytest.fixture
+def sample_df():
+    """Sample dataframe with numeric columns for EDA tests."""
+    np.random.seed(0)
+    df = pd.DataFrame({
+        "feat1": np.random.randn(100),
+        "feat2": np.random.randn(100) * 2 + 1,
+        "target": np.random.choice([0, 1], size=100),
+    })
+    return df
+
+
+@pytest.fixture
+def sample_df_missing(sample_df):
+    """Sample dataframe with missing values."""
+    df = sample_df.copy()
+    df.loc[0:4, "feat1"] = np.nan
+    return df
+
+
+@pytest.fixture
+def tmp_mlvern_dir(tmp_path: Path):
+    """Create a temporary .mlvern directory structure."""
+    d = tmp_path / ".mlvern"
+    plots = d / "plots"
+    reports = d / "reports"
+    plots.mkdir(parents=True)
+    reports.mkdir(parents=True)
+    return str(d)
+
+
+@pytest.fixture
+def tmp_examples_mlvern(tmp_path, monkeypatch):
+    """Create examples/.mlvern and change to tmp_path."""
+    examples = tmp_path / "examples"
+    m = examples / ".mlvern"
+    (m / "plots").mkdir(parents=True)
+    (m / "reports").mkdir(parents=True)
+    monkeypatch.chdir(tmp_path)
+    yield str(m)
+    # cleanup
+    try:
+        shutil.rmtree(str(tmp_path))
+    except Exception:
+        pass
