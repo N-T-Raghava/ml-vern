@@ -4,9 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlvern"
-version = "0.1.6"
-description = "Local-first ML pipeline automation with versioning"
-authors = [{name="Your Name"}]
+version = "0.1.7"
+description = "Implemented the complete first and second layers of the data analysis pipeline. 
+                This version introduces automated data inspection, validation checks, and an extensive EDA module that generates structured reports and organized visualizations.
+                The goal of this release is to establish a solid, industry-aligned foundation for reliable data quality assessment and exploratory analysis before model training."
+authors = [{name="Tanmai Raghava"}]
 readme = "README.md"
 requires-python = ">=3.9"
 
