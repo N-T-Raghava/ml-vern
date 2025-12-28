@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -220,8 +222,10 @@ def dimensionality_signals(df: pd.DataFrame, n_components: int = 5) -> Dict[str,
         return {"status": "svd_failed"}
 
 
-def compute_statistics(df: pd.DataFrame, target: Optional[str] = None) -> Dict[str, Any]:
+def compute_statistics(df: pd.DataFrame, target: Optional[str] = None,
+                       mlvern_dir: Optional[str] = None) -> Dict[str, Any]:
     """Top-level statistics collection combining many of the above functions."""
+
     stats_report: Dict[str, Any] = {}
     stats_report["numeric_summary"] = numeric_summary(df)
     stats_report["distribution_shapes"] = {
@@ -235,4 +239,12 @@ def compute_statistics(df: pd.DataFrame, target: Optional[str] = None) -> Dict[s
     stats_report["redundant_features"] = redundant_features(df)
     stats_report["interaction_patterns"] = interaction_patterns(df, target)
     stats_report["dimensionality_signals"] = dimensionality_signals(df)
+
+    # Save report if mlvern_dir is provided
+    if mlvern_dir is not None:
+        reports_dir = Path(mlvern_dir) / "reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        report_path = reports_dir / "statistics_report.json"
+        report_path.write_text(json.dumps(stats_report, indent=4), encoding="utf-8")
+
     return stats_report

@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import numpy as np
@@ -112,7 +114,9 @@ def run_risk_checks(
     baseline: Optional[pd.DataFrame] = None,
     train: Optional[pd.DataFrame] = None,
     test: Optional[pd.DataFrame] = None,
+    mlvern_dir: Optional[str] = None,
 ) -> Dict[str, Any]:
+
     report: Dict[str, Any] = {}
     if target is not None:
         report["class_imbalance"] = class_imbalance(df, target)
@@ -124,4 +128,12 @@ def run_risk_checks(
         report["data_drift"] = data_drift(baseline, df)
     if train is not None and test is not None:
         report["train_test_mismatch"] = train_test_mismatch(train, test)
+
+    # Save report if mlvern_dir is provided
+    if mlvern_dir is not None:
+        reports_dir = Path(mlvern_dir) / "reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        report_path = reports_dir / "risk_report.json"
+        report_path.write_text(json.dumps(report, indent=4), encoding="utf-8")
+
     return report
