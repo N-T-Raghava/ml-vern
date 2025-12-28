@@ -1,4 +1,5 @@
 """Test explicit skip behavior for insufficient rows."""
+
 import pandas as pd
 
 from mlvern.data.inspect import DataInspector

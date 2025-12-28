@@ -76,11 +76,13 @@ def run_eda(mlvern_dir):
 def sample_df():
     """Sample dataframe with numeric columns for EDA tests."""
     np.random.seed(0)
-    df = pd.DataFrame({
-        "feat1": np.random.randn(100),
-        "feat2": np.random.randn(100) * 2 + 1,
-        "target": np.random.choice([0, 1], size=100),
-    })
+    df = pd.DataFrame(
+        {
+            "feat1": np.random.randn(100),
+            "feat2": np.random.randn(100) * 2 + 1,
+            "target": np.random.choice([0, 1], size=100),
+        }
+    )
     return df
 
 

@@ -26,7 +26,9 @@ def numeric_df():
 
 @pytest.fixture
 def target_df():
-    return pd.DataFrame({"feat": list(range(10)), "target": [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]})
+    return pd.DataFrame(
+        {"feat": list(range(10)), "target": [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]}
+    )
 
 
 @pytest.fixture
@@ -37,12 +39,14 @@ def tmp_reports_dir(tmp_path: Path):
 @pytest.fixture
 def risk_df():
     # DataFrame with a binary target and a sensitive column
-    return pd.DataFrame({
-        "feat1": [1, 2, 3, 4, 5, 6],
-        "feat2": [10, 11, 12, 13, 14, 15],
-        "target": [0, 1, 0, 1, 0, 1],
-        "sex": ["M", "F", "M", "F", "M", "F"],
-    })
+    return pd.DataFrame(
+        {
+            "feat1": [1, 2, 3, 4, 5, 6],
+            "feat2": [10, 11, 12, 13, 14, 15],
+            "target": [0, 1, 0, 1, 0, 1],
+            "sex": ["M", "F", "M", "F", "M", "F"],
+        }
+    )
 
 
 @pytest.fixture
@@ -65,12 +69,14 @@ def stats_df():
     import numpy as _np
 
     rng = _np.random.RandomState(0)
-    return pd.DataFrame({
-        "a": rng.normal(0, 1, size=200),
-        "b": rng.normal(5, 2, size=200),
-        "c": rng.uniform(-1, 1, size=200),
-        "target": [0, 1] * 100,
-    })
+    return pd.DataFrame(
+        {
+            "a": rng.normal(0, 1, size=200),
+            "b": rng.normal(5, 2, size=200),
+            "c": rng.uniform(-1, 1, size=200),
+            "target": [0, 1] * 100,
+        }
+    )
 
 
 @pytest.fixture

@@ -30,11 +30,25 @@ class Forge:
         """Run statistical analyses and return a structured report."""
         return compute_statistics(data, target, self.mlvern_dir)
 
-    def risk_check(self, data, target: Optional[str] = None, sensitive: Optional[list] = None,
-                   baseline=None, train=None, test=None):
+    def risk_check(
+        self,
+        data,
+        target: Optional[str] = None,
+        sensitive: Optional[list] = None,
+        baseline=None,
+        train=None,
+        test=None,
+    ):
         """Run risk checks (imbalance, leakage, drift, mismatch)."""
-        return run_risk_checks(data, target=target, sensitive=sensitive, baseline=baseline,
-                               train=train, test=test, mlvern_dir=self.mlvern_dir)
+        return run_risk_checks(
+            data,
+            target=target,
+            sensitive=sensitive,
+            baseline=baseline,
+            train=train,
+            test=test,
+            mlvern_dir=self.mlvern_dir,
+        )
 
     def plot(self, task: str, y_true=None, y_pred=None, y_prob=None):
         auto_plot(

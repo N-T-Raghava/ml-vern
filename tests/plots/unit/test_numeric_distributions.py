@@ -10,11 +10,7 @@ def test_numeric_distribution_plots_created(run_eda, mlvern_dir, numeric_df):
     # expect histogram for each numeric column
     for col in ["a", "b"]:
         expected = (
-            Path(mlvern_dir)
-            / "plots"
-            / "eda"
-            / "distributions"
-            / f"{col}_hist.png"
+            Path(mlvern_dir) / "plots" / "eda" / "distributions" / f"{col}_hist.png"
         )
         assert str(expected) in plots
         assert expected.exists()

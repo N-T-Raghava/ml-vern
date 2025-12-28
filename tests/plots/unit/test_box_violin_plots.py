@@ -8,20 +8,8 @@ def test_box_and_violin_plots_created(run_eda, mlvern_dir, numeric_df):
     res = run_eda(numeric_df)
     plots = res["plots"]
     for col in ["a", "b"]:
-        box = (
-            Path(mlvern_dir)
-            / "plots"
-            / "eda"
-            / "box_violin"
-            / f"{col}_box.png"
-        )
-        violin = (
-            Path(mlvern_dir)
-            / "plots"
-            / "eda"
-            / "box_violin"
-            / f"{col}_violin.png"
-        )
+        box = Path(mlvern_dir) / "plots" / "eda" / "box_violin" / f"{col}_box.png"
+        violin = Path(mlvern_dir) / "plots" / "eda" / "box_violin" / f"{col}_violin.png"
         assert str(box) in plots
         assert box.exists()
         # violin may be missing in some envs but if reported it must exist

@@ -7,11 +7,7 @@ from mlvern.visual.eda import basic_eda
 def test_correlation_heatmap_created(run_eda, mlvern_dir, numeric_df):
     res = run_eda(numeric_df)
     corr = (
-        Path(mlvern_dir)
-        / "plots"
-        / "eda"
-        / "correlation"
-        / "correlation_heatmap.png"
+        Path(mlvern_dir) / "plots" / "eda" / "correlation" / "correlation_heatmap.png"
     )
     assert str(corr) in res["plots"]
     assert corr.exists()
