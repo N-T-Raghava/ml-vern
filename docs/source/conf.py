@@ -10,8 +10,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../mlvern'))
 
-project = 'mlvern'
-copyright = '2025, Tanmai Raghava'
+project = u'mlvern'
+copyright = u'2025, Tanmai Raghava'
 author = 'Tanmai Raghava'
 release = '0.1.8'
 
@@ -22,7 +22,7 @@ extensions = ["sphinx.ext.autodoc",
             "sphinx.ext.napoleon",
             "sphinx.ext.viewcode",
             "sphinx.ext.autosummary",]
-
+masterdoc = 'index'
 templates_path = ['_templates']
 exclude_patterns = []
 

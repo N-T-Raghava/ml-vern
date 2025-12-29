@@ -1,0 +1,197 @@
+{
+    "metadata": {
+        "generated_at": "2025-12-29T17:36:57.326348+00:00",
+        "library": "mlvern",
+        "version": "0.1.0"
+    },
+    "part_1_profiling": {
+        "dataset_shape": {
+            "rows": 150,
+            "columns": 5,
+            "memory_mb": 0.0058,
+            "sparsity_percent": 0.0
+        },
+        "schema": {
+            "sepal length (cm)": {
+                "dtype": "float64",
+                "non_null_count": 150
+            },
+            "sepal width (cm)": {
+                "dtype": "float64",
+                "non_null_count": 150
+            },
+            "petal length (cm)": {
+                "dtype": "float64",
+                "non_null_count": 150
+            },
+            "petal width (cm)": {
+                "dtype": "float64",
+                "non_null_count": 150
+            },
+            "target": {
+                "dtype": "int64",
+                "non_null_count": 150
+            }
+        },
+        "missing_values": {
+            "total_missing": 0,
+            "columns_affected": 0,
+            "details": {}
+        },
+        "duplicates": {
+            "total": 1,
+            "percentage": 0.67,
+            "by_features": 2
+        },
+        "cardinality": {},
+        "numeric_ranges": {
+            "sepal length (cm)": {
+                "min": 4.3,
+                "max": 7.9,
+                "mean": 5.843333333333334,
+                "median": 5.8,
+                "std": 0.8253012917851409,
+                "q25": 5.1,
+                "q75": 6.4
+            },
+            "sepal width (cm)": {
+                "min": 2.0,
+                "max": 4.4,
+                "mean": 3.0573333333333337,
+                "median": 3.0,
+                "std": 0.4344109677354946,
+                "q25": 2.8,
+                "q75": 3.3
+            },
+            "petal length (cm)": {
+                "min": 1.0,
+                "max": 6.9,
+                "mean": 3.7580000000000005,
+                "median": 4.35,
+                "std": 1.759404065775303,
+                "q25": 1.6,
+                "q75": 5.1
+            },
+            "petal width (cm)": {
+                "min": 0.1,
+                "max": 2.5,
+                "mean": 1.1993333333333336,
+                "median": 1.3,
+                "std": 0.7596926279021594,
+                "q25": 0.3,
+                "q75": 1.8
+            },
+            "target": {
+                "min": 0.0,
+                "max": 2.0,
+                "mean": 1.0,
+                "median": 1.0,
+                "std": 0.816496580927726,
+                "q25": 0.0,
+                "q75": 2.0
+            }
+        },
+        "outliers": {
+            "sepal width (cm)": {
+                "count": 4,
+                "percentage": 2.67,
+                "lower_bound": 2.05,
+                "upper_bound": 4.05
+            }
+        },
+        "target_distribution": {
+            "target": "target",
+            "type": "numeric",
+            "class_distribution": {
+                "0": 50,
+                "1": 50,
+                "2": 50
+            },
+            "imbalance_ratio": 1.0,
+            "n_classes": 3
+        }
+    },
+    "part_2_validation": {
+        "schema_validation": {
+            "is_valid": true,
+            "issues": []
+        },
+        "range_constraints": {
+            "is_valid": true,
+            "violations": {}
+        },
+        "null_thresholds": {
+            "is_valid": true,
+            "threshold_percent": 50.0,
+            "violations": {}
+        },
+        "type_consistency": {
+            "is_valid": true,
+            "issues": {}
+        },
+        "leakage_checks": {
+            "has_leakage_risk": false,
+            "indicators": []
+        },
+        "temporal_validity": {
+            "has_temporal_columns": true,
+            "columns": {
+                "sepal length (cm)": {
+                    "dtype": "float64",
+                    "parsed_count": 150,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00.000000004",
+                        "max": "1970-01-01 00:00:00.000000007"
+                    }
+                },
+                "sepal width (cm)": {
+                    "dtype": "float64",
+                    "parsed_count": 150,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00.000000002",
+                        "max": "1970-01-01 00:00:00.000000004"
+                    }
+                },
+                "petal length (cm)": {
+                    "dtype": "float64",
+                    "parsed_count": 150,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00.000000001",
+                        "max": "1970-01-01 00:00:00.000000006"
+                    }
+                },
+                "petal width (cm)": {
+                    "dtype": "float64",
+                    "parsed_count": 150,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00",
+                        "max": "1970-01-01 00:00:00.000000002"
+                    }
+                },
+                "target": {
+                    "dtype": "int64",
+                    "parsed_count": 150,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00",
+                        "max": "1970-01-01 00:00:00.000000002"
+                    }
+                }
+            }
+        }
+    },
+    "vulnerabilities": [
+        {
+            "severity": "WARNING",
+            "type": "DUPLICATES",
+            "message": "1 duplicate rows detected"
+        }
+    ],
+    "recommendations": [
+        "Consider removing or investigating duplicate rows"
+    ]
+}

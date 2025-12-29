@@ -1,0 +1,173 @@
+{
+    "numeric_summary": {
+        "feature1": {
+            "mean": -0.10384651739409384,
+            "median": -0.1269562917797126,
+            "std": 0.9036161766446296,
+            "skewness": -0.17794814262595224,
+            "kurtosis": -0.10097745347286669,
+            "count": 100
+        },
+        "feature2": {
+            "mean": 0.022304587049923885,
+            "median": 0.08410716994683427,
+            "std": 0.9488886405106461,
+            "skewness": 0.38698376473649987,
+            "kurtosis": 0.03097902686108034,
+            "count": 100
+        },
+        "feature3": {
+            "mean": 0.06489625310044843,
+            "median": 0.0976957423187853,
+            "std": 1.0788478462454079,
+            "skewness": 0.17776158930860989,
+            "kurtosis": 1.125854576025072,
+            "count": 100
+        },
+        "target": {
+            "mean": 0.91,
+            "median": 1.0,
+            "std": 0.8613361713059542,
+            "skewness": 0.17642524951938143,
+            "kurtosis": -1.6524613752725532,
+            "count": 100
+        }
+    },
+    "distribution_shapes": {
+        "feature1": {
+            "skewness": -0.17794814262595224,
+            "kurtosis": -0.10097745347286669,
+            "shape": "normal"
+        },
+        "feature2": {
+            "skewness": 0.38698376473649987,
+            "kurtosis": 0.03097902686108034,
+            "shape": "normal"
+        },
+        "feature3": {
+            "skewness": 0.17776158930860989,
+            "kurtosis": 1.125854576025072,
+            "shape": "normal"
+        },
+        "target": {
+            "skewness": 0.17642524951938143,
+            "kurtosis": -1.6524613752725532,
+            "shape": "normal"
+        }
+    },
+    "correlations_pearson": {
+        "feature1": {
+            "feature1": 1.0,
+            "feature2": -0.13642221217000244,
+            "feature3": 0.19083991336126763,
+            "target": -0.043935627099606314
+        },
+        "feature2": {
+            "feature1": -0.13642221217000244,
+            "feature2": 1.0,
+            "feature3": -0.036631745747155886,
+            "target": -0.02045753109166392
+        },
+        "feature3": {
+            "feature1": 0.19083991336126763,
+            "feature2": -0.036631745747155886,
+            "feature3": 1.0,
+            "target": -0.13387277261056915
+        },
+        "target": {
+            "feature1": -0.043935627099606314,
+            "feature2": -0.02045753109166392,
+            "feature3": -0.13387277261056915,
+            "target": 1.0
+        }
+    },
+    "correlations_spearman": {
+        "feature1": {
+            "feature1": 1.0,
+            "feature2": -0.10796279627962796,
+            "feature3": 0.1766936693669367,
+            "target": -0.036063396318493465
+        },
+        "feature2": {
+            "feature1": -0.10796279627962796,
+            "feature2": 1.0,
+            "feature3": -0.052505250525052505,
+            "target": -0.02679728523594817
+        },
+        "feature3": {
+            "feature1": 0.1766936693669367,
+            "feature2": -0.052505250525052505,
+            "feature3": 1.0,
+            "target": -0.15930139032145912
+        },
+        "target": {
+            "feature1": -0.036063396318493465,
+            "feature2": -0.02679728523594817,
+            "feature3": -0.15930139032145912,
+            "target": 1.0
+        }
+    },
+    "feature_target_association": {
+        "feature1": {
+            "mutual_info": 0.1288886348396528,
+            "correlation": -0.04393562709960631
+        },
+        "feature2": {
+            "mutual_info": 0.09871391826076807,
+            "correlation": -0.02045753109166385
+        },
+        "feature3": {
+            "mutual_info": 0.06890726664258887,
+            "correlation": -0.13387277261056915
+        }
+    },
+    "vif": {
+        "feature1": 1.0567177815058855,
+        "feature2": 1.0199050403740626,
+        "feature3": 1.0552923051274912,
+        "target": 1.0194325886805693
+    },
+    "redundant_features": [],
+    "interaction_patterns": {
+        "interactions": [
+            [
+                "feature1",
+                "target",
+                -0.13843296171439637
+            ],
+            [
+                "feature1",
+                "feature2",
+                0.10274823319976575
+            ],
+            [
+                "feature2",
+                "target",
+                -0.09250409109039835
+            ],
+            [
+                "feature3",
+                "target",
+                -0.09177139822970298
+            ],
+            [
+                "feature2",
+                "feature3",
+                -0.07415195614848658
+            ],
+            [
+                "feature1",
+                "feature3",
+                0.03225925866023583
+            ]
+        ]
+    },
+    "dimensionality_signals": {
+        "explained_variance_ratio": [
+            0.3561266935615446,
+            0.2583100208220883,
+            0.1945171184104088,
+            0.19104616720595832
+        ]
+    }
+}

@@ -1,80 +1,61 @@
 import os
-from typing import Optional
 
-from mlvern.data.inspect import inspect_data
-from mlvern.data.risk_check import run_risk_checks
-from mlvern.data.statistics import compute_statistics
+from mlvern.data.register import register_dataset
 from mlvern.train.trainer import train_model
-from mlvern.version.checkout import checkout_commit
-from mlvern.version.commit import commit_run, log_commits
-from mlvern.visual.auto_plot import auto_plot
-from mlvern.visual.eda import basic_eda
+from mlvern.utils.registry import init_registry
+from mlvern.version.run_manager import create_run
 
 
 class Forge:
     def __init__(self, project: str, base_dir: str = "."):
         self.project = project
         self.base_dir = os.path.abspath(base_dir)
-        self.mlvern_dir = os.path.join(self.base_dir, ".mlvern")
-        self._init_workspace()
+        self.mlvern_dir = os.path.join(
+            self.base_dir, f".mlvern_{project}"
+        )
 
-    def _init_workspace(self):
+    def init(self):
         os.makedirs(self.mlvern_dir, exist_ok=True)
-        for d in ["commits", "plots", "reports"]:
+        for d in ["datasets", "runs", "models"]:
             os.makedirs(os.path.join(self.mlvern_dir, d), exist_ok=True)
 
-    def inspect(self, data, target: str):
-        return inspect_data(data, target, self.mlvern_dir)
+        registry_path = os.path.join(self.mlvern_dir, "registry.json")
+        if not os.path.exists(registry_path):
+            init_registry(self.mlvern_dir, self.project)
 
-    def statistics(self, data, target: Optional[str] = None):
-        """Run statistical analyses and return a structured report."""
-        return compute_statistics(data, target, self.mlvern_dir)
+    # -------- DATASET --------
+    def register_dataset(self, df, target: str):
+        return register_dataset(df, target, self.mlvern_dir)
 
-    def risk_check(
+    def list_datasets(self):
+        from mlvern.utils.registry import load_registry
+        return load_registry(self.mlvern_dir).get("datasets", {})
+
+    def list_runs(self):
+        from mlvern.utils.registry import load_registry
+        return load_registry(self.mlvern_dir).get("runs", {})
+
+    # -------- TRAIN + RUN --------
+    def run(
         self,
-        data,
-        target: Optional[str] = None,
-        sensitive: Optional[list] = None,
-        baseline=None,
-        train=None,
-        test=None,
+        model,
+        X_train,
+        y_train,
+        X_val,
+        y_val,
+        config: dict,
+        dataset_fp,
     ):
-        """Run risk checks (imbalance, leakage, drift, mismatch)."""
-        return run_risk_checks(
-            data,
-            target=target,
-            sensitive=sensitive,
-            baseline=baseline,
-            train=train,
-            test=test,
-            mlvern_dir=self.mlvern_dir,
+        model, metrics = train_model(
+            model, X_train, y_train, X_val, y_val
         )
 
-    def plot(self, task: str, y_true=None, y_pred=None, y_prob=None):
-        auto_plot(
-            task=task,
-            y_true=y_true,
-            y_pred=y_pred,
-            y_prob=y_prob,
-            output_dir=os.path.join(self.mlvern_dir, "plots"),
+        run_id = create_run(
+            self.mlvern_dir,
+            dataset_fp,
+            model,
+            metrics,
+            config,
         )
 
-    def eda(self, data, target: Optional[str] = None):
-        return basic_eda(
-            data,
-            os.path.join(self.mlvern_dir, "plots", "eda"),
-            mlvern_dir=self.mlvern_dir,
-            target=target,
-        )
-
-    def train(self, model, X_train, y_train, X_val=None, y_val=None):
-        return train_model(model, X_train, y_train, X_val, y_val)
-
-    def commit(self, message: str, model, metrics: dict, params: dict):
-        return commit_run(self.mlvern_dir, message, model, metrics, params)
-
-    def checkout(self, commit_id: str):
-        return checkout_commit(self.mlvern_dir, commit_id)
-
-    def log(self):
-        return log_commits(self.mlvern_dir)
+        return run_id, metrics

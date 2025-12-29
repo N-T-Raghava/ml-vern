@@ -1,0 +1,15 @@
+{
+    "columns": [
+        "feature1",
+        "feature2",
+        "feature3",
+        "target"
+    ],
+    "dtypes": {
+        "feature1": "float64",
+        "feature2": "float64",
+        "feature3": "float64",
+        "target": "int32"
+    },
+    "target": "target"
+}

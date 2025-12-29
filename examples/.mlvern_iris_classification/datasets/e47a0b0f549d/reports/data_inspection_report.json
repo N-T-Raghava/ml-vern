@@ -1,0 +1,177 @@
+{
+    "metadata": {
+        "generated_at": "2025-12-29T17:36:57.536441+00:00",
+        "library": "mlvern",
+        "version": "0.1.0"
+    },
+    "part_1_profiling": {
+        "dataset_shape": {
+            "rows": 100,
+            "columns": 4,
+            "memory_mb": 0.0028,
+            "sparsity_percent": 0.0
+        },
+        "schema": {
+            "feature1": {
+                "dtype": "float64",
+                "non_null_count": 100
+            },
+            "feature2": {
+                "dtype": "float64",
+                "non_null_count": 100
+            },
+            "feature3": {
+                "dtype": "float64",
+                "non_null_count": 100
+            },
+            "target": {
+                "dtype": "int32",
+                "non_null_count": 100
+            }
+        },
+        "missing_values": {
+            "total_missing": 0,
+            "columns_affected": 0,
+            "details": {}
+        },
+        "duplicates": {
+            "total": 0
+        },
+        "cardinality": {},
+        "numeric_ranges": {
+            "feature1": {
+                "min": -2.6197451040897444,
+                "max": 1.8522781845089378,
+                "mean": -0.10384651739409384,
+                "median": -0.1269562917797126,
+                "std": 0.9036161766446296,
+                "q25": -0.6009056704964529,
+                "q75": 0.40595205201206214
+            },
+            "feature2": {
+                "min": -1.9187712152990415,
+                "max": 2.720169166589619,
+                "mean": 0.022304587049923885,
+                "median": 0.08410716994683427,
+                "std": 0.9488886405106461,
+                "q25": -0.8056605231575737,
+                "q75": 0.5381704476627408
+            },
+            "feature3": {
+                "min": -3.2412673400690726,
+                "max": 3.852731490654721,
+                "mean": 0.06489625310044843,
+                "median": 0.0976957423187853,
+                "std": 1.0788478462454079,
+                "q25": -0.6554435406223809,
+                "q75": 0.7044374479042019
+            },
+            "target": {
+                "min": 0.0,
+                "max": 2.0,
+                "mean": 0.91,
+                "median": 1.0,
+                "std": 0.8613361713059542,
+                "q25": 0.0,
+                "q75": 2.0
+            }
+        },
+        "outliers": {
+            "feature1": {
+                "count": 1,
+                "percentage": 1.0,
+                "lower_bound": -2.1111922542592256,
+                "upper_bound": 1.9162386357748347
+            },
+            "feature2": {
+                "count": 1,
+                "percentage": 1.0,
+                "lower_bound": -2.8214069793880454,
+                "upper_bound": 2.5539169038932124
+            },
+            "feature3": {
+                "count": 2,
+                "percentage": 2.0,
+                "lower_bound": -2.6952650234122553,
+                "upper_bound": 2.744258930694076
+            }
+        },
+        "target_distribution": {
+            "target": "target",
+            "type": "numeric",
+            "class_distribution": {
+                "0": 42,
+                "2": 33,
+                "1": 25
+            },
+            "imbalance_ratio": 1.68,
+            "n_classes": 3
+        }
+    },
+    "part_2_validation": {
+        "schema_validation": {
+            "is_valid": true,
+            "issues": []
+        },
+        "range_constraints": {
+            "is_valid": true,
+            "violations": {}
+        },
+        "null_thresholds": {
+            "is_valid": true,
+            "threshold_percent": 50.0,
+            "violations": {}
+        },
+        "type_consistency": {
+            "is_valid": true,
+            "issues": {}
+        },
+        "leakage_checks": {
+            "has_leakage_risk": false,
+            "indicators": []
+        },
+        "temporal_validity": {
+            "has_temporal_columns": true,
+            "columns": {
+                "feature1": {
+                    "dtype": "float64",
+                    "parsed_count": 100,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1969-12-31 23:59:59.999999998",
+                        "max": "1970-01-01 00:00:00.000000001"
+                    }
+                },
+                "feature2": {
+                    "dtype": "float64",
+                    "parsed_count": 100,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1969-12-31 23:59:59.999999999",
+                        "max": "1970-01-01 00:00:00.000000002"
+                    }
+                },
+                "feature3": {
+                    "dtype": "float64",
+                    "parsed_count": 100,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1969-12-31 23:59:59.999999997",
+                        "max": "1970-01-01 00:00:00.000000003"
+                    }
+                },
+                "target": {
+                    "dtype": "int32",
+                    "parsed_count": 100,
+                    "invalid_dates": 0,
+                    "date_range": {
+                        "min": "1970-01-01 00:00:00",
+                        "max": "1970-01-01 00:00:00.000000002"
+                    }
+                }
+            }
+        }
+    },
+    "vulnerabilities": [],
+    "recommendations": []
+}
