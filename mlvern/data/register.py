@@ -7,6 +7,7 @@ from mlvern.data.inspect import inspect_data
 from mlvern.data.risk_check import run_risk_checks
 from mlvern.data.statistics import compute_statistics
 from mlvern.utils.registry import load_registry, save_registry
+from mlvern.visual.eda import basic_eda
 
 
 def register_dataset(df, target, mlvern_dir):
@@ -27,6 +28,10 @@ def register_dataset(df, target, mlvern_dir):
     inspect_data(df, target, dataset_path)
     compute_statistics(df, target, dataset_path)
     run_risk_checks(df, target=target, mlvern_dir=dataset_path)
+
+    # ---- Generate EDA plots ----
+    plots_dir = os.path.join(dataset_path, "plots")
+    basic_eda(df, output_dir=plots_dir, target=target)
 
     # ---- Save schema ----
     with open(os.path.join(dataset_path, "schema.json"), "w") as f:
