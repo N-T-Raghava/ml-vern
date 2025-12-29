@@ -15,9 +15,8 @@ sphinx:
   configuration: docs/source/conf.py
   fail_on_warning: false
 
-# Python configuration
+# Python dependencies
 python:
-  version: 3.11
   install:
     - method: pip
       path: .
