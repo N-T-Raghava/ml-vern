@@ -19,8 +19,7 @@ sphinx:
 python:
   install:
     - method: pip
-      path: .
-      extra: docs
+      path: .[docs]
 
 # Format of output
 formats:
