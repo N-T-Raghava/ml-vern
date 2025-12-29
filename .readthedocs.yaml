@@ -15,36 +15,15 @@ sphinx:
   configuration: docs/source/conf.py
   fail_on_warning: false
 
-# Optional but recommended
+# Python configuration
 python:
   version: 3.11
   install:
     - method: pip
       path: .
-      extra: dev
-
-# Additional dependencies for docs building
-# These are installed in addition to the project dependencies
-build_extra_requirements:
-  - sphinx_rtd_theme
-
-# Don't build pull request previews for private repositories
-# pull_requests:
-#   preview: false
-
-# Optional: Redirect /latest/ to /stable/
-# redirects:
-#   latest: stable
+      extra: docs
 
 # Format of output
 formats:
   - pdf
   - epub
-
-# Cache pip dependencies for faster builds
-python:
-  install:
-    - method: pip
-      path: .
-      extra: dev
-  version: 3.11
