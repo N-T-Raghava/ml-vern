@@ -22,32 +22,47 @@ def class_imbalance(df: pd.DataFrame, target: str) -> Dict[str, Any]:
     return {"counts": counts, "imbalance_ratio": imbalance_ratio}
 
 
-def sensitive_attribute_imbalance(df: pd.DataFrame, sensitive_cols: List[str]) -> Dict[str, Any]:
+def sensitive_attribute_imbalance(
+    df: pd.DataFrame, sensitive_cols: List[str]
+) -> Dict[str, Any]:
     result = {}
     for col in sensitive_cols:
         if col not in df.columns:
             result[col] = {"error": "not_present"}
             continue
-        result[col] = df[col].value_counts(normalize=True).to_dict()
+        result[col] = df[col].value_counts(
+            normalize=True
+        ).to_dict()
     return result
 
 
-def sampling_bias(baseline: pd.DataFrame, current: pd.DataFrame,
-                  cols: Optional[List[str]] = None) -> Dict[str, Any]:
-    """Compare categorical distributions between baseline and current using chi-squared test."""
+def sampling_bias(
+    baseline: pd.DataFrame,
+    current: pd.DataFrame,
+    cols: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Compare categorical distributions using chi-squared test."""
     if cols is None:
         cols = baseline.columns.intersection(current.columns).tolist()
     report = {}
     for col in cols:
         if pd.api.types.is_numeric_dtype(baseline[col]):
             # bin numeric into quartiles
-            bins = np.quantile(np.concatenate([baseline[col].dropna(), current[col].dropna()]),
-                               [0, 0.25, 0.5, 0.75, 1.0])
+            bins = np.quantile(
+                np.concatenate(
+                    [
+                        baseline[col].dropna(),
+                        current[col].dropna(),
+                    ]
+                ),
+                [0, 0.25, 0.5, 0.75, 1.0],
+            )
             b_cat = pd.cut(baseline[col], bins=bins, include_lowest=True)
             c_cat = pd.cut(current[col], bins=bins, include_lowest=True)
             tbl = pd.crosstab(b_cat, c_cat)
         else:
-            tbl = pd.crosstab(baseline[col].fillna("__NA__"), current[col].fillna("__NA__"))
+            tbl = pd.crosstab(baseline[col].fillna("__NA__"),
+                              current[col].fillna("__NA__"))
         try:
             chi2, p, _, _ = stats.chi2_contingency(tbl)
             report[col] = {"chi2": float(chi2), "pvalue": float(p)}
@@ -69,8 +84,10 @@ def target_leakage_detection(df: pd.DataFrame, target: str,
         mi = None
         if mutual_info_score is not None:
             try:
-                mi = mutual_info_score(pd.cut(numeric[col], bins=10).astype(str),
-                                       pd.cut(numeric[target], bins=10).astype(str))
+                mi = mutual_info_score(
+                    pd.cut(numeric[col], bins=10).astype(str),
+                    pd.cut(numeric[target], bins=10).astype(str),
+                )
             except Exception:
                 mi = None
         if pd.isna(corr):
@@ -80,9 +97,15 @@ def target_leakage_detection(df: pd.DataFrame, target: str,
     return out
 
 
-def data_drift(baseline: pd.DataFrame, current: pd.DataFrame,
-               cols: Optional[List[str]] = None) -> Dict[str, Any]:
-    """Check drift between baseline and current using KS for numeric, chi2 for categorical."""
+def data_drift(
+    baseline: pd.DataFrame,
+    current: pd.DataFrame,
+    cols: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Check drift between baseline and current.
+
+    Uses KS for numeric, chi2 for categorical.
+    """
     if cols is None:
         cols = baseline.columns.intersection(current.columns).tolist()
     report = {}
@@ -93,7 +116,8 @@ def data_drift(baseline: pd.DataFrame, current: pd.DataFrame,
                 report[col] = {"ks_stat": float(stat), "pvalue": float(p)}
             else:
                 # chi2 on contingency table of categories
-                tbl = pd.crosstab(baseline[col].fillna("__NA__"), current[col].fillna("__NA__"))
+                tbl = pd.crosstab(baseline[col].fillna("__NA__"),
+                                  current[col].fillna("__NA__"))
                 chi2, p, _, _ = stats.chi2_contingency(tbl)
                 report[col] = {"chi2": float(chi2), "pvalue": float(p)}
         except Exception:

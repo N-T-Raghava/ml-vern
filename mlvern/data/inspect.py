@@ -73,7 +73,10 @@ class DataInspector:
         return {
             "rows": int(self.df.shape[0]),
             "columns": int(self.df.shape[1]),
-            "memory_mb": round(self.df.memory_usage(deep=True).sum() / (1024 ** 2), 4),
+            "memory_mb": round(
+                self.df.memory_usage(deep=True).sum() / (1024 ** 2),
+                4,
+            ),
             "sparsity_percent": round(
                 (self.df.size - self.df.count().sum()) / self.df.size * 100, 2
             ),

@@ -637,3 +637,712 @@ class TestRegistrySaveOperations:
         assert loaded["metadata"]["version"] == "1.0"
         assert loaded["datasets"]["hash123"]["rows"] == 100
         assert loaded["runs"]["run_001"]["accuracy"] == 0.95
+
+
+# ============================================================================
+# TESTS: New Forge API - Dataset Accessors
+# ============================================================================
+
+
+class TestForgeDatasetAccessors:
+    """Tests for Forge dataset accessor methods."""
+
+    def test_get_dataset_path_success(self, tmp_mlvern_dir, sample_df):
+        """Test retrieving dataset path by hash."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        path = forge.get_dataset_path(dataset_hash)
+
+        assert path is not None
+        assert os.path.exists(path)
+        assert dataset_hash in path
+
+    def test_get_dataset_path_not_found(self, tmp_mlvern_dir):
+        """Test get_dataset_path raises error for non-existent hash."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        with pytest.raises(ValueError, match="not found"):
+            forge.get_dataset_path("nonexistent_hash")
+
+    def test_load_dataset_metadata(self, tmp_mlvern_dir, sample_df):
+        """Test loading dataset metadata and paths."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        dataset_info = forge.load_dataset(dataset_hash)
+
+        assert dataset_info["dataset_hash"] == dataset_hash
+        assert "path" in dataset_info
+        assert "schema" in dataset_info
+        assert "metadata" in dataset_info
+        assert "report_paths" in dataset_info
+        assert "plot_paths" in dataset_info
+        assert dataset_info["schema"]["target"] == "target"
+
+    def test_load_dataset_not_found(self, tmp_mlvern_dir):
+        """Test load_dataset raises error for non-existent hash."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        with pytest.raises(ValueError):
+            forge.load_dataset("nonexistent_hash")
+
+    def test_load_dataset_has_reports(self, tmp_mlvern_dir, sample_df):
+        """Test that loaded dataset includes report paths when available."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        dataset_info = forge.load_dataset(dataset_hash)
+
+        assert "report_paths" in dataset_info
+        assert isinstance(dataset_info["report_paths"], dict)
+
+
+# ============================================================================
+# TESTS: New Forge API - Run/Model Accessors
+# ============================================================================
+
+
+class TestForgeRunAccessors:
+    """Tests for Forge run and model accessor methods."""
+
+    def test_get_run_success(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test retrieving run metadata and information."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        run_info = forge.get_run(run_id)
+
+        assert run_info["run_id"] == run_id
+        assert "metadata" in run_info
+        assert "metrics" in run_info
+        assert "config" in run_info
+        assert "tags" in run_info
+        assert "registry_info" in run_info
+
+    def test_get_run_not_found(self, tmp_mlvern_dir):
+        """Test get_run raises error for non-existent run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        with pytest.raises(ValueError, match="not found"):
+            forge.get_run("nonexistent_run")
+
+    def test_get_run_metrics(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test retrieving metrics for a specific run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, metrics = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
+
+        retrieved_metrics = forge.get_run_metrics(run_id)
+
+        assert retrieved_metrics == metrics
+        assert "accuracy" in retrieved_metrics
+
+    def test_get_run_artifacts(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test retrieving artifact paths for a run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        artifacts = forge.get_run_artifacts(run_id)
+
+        assert "run_dir" in artifacts
+        assert "meta.json" in artifacts
+        assert "config.json" in artifacts
+        assert "metrics.json" in artifacts
+        assert "artifact_model.pkl" in artifacts
+        assert all(os.path.exists(path) for path in artifacts.values())
+
+    def test_load_model_success(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test loading a trained model from a run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        loaded_model = forge.load_model(run_id)
+
+        assert loaded_model is not None
+        assert hasattr(loaded_model, "predict")
+        assert hasattr(loaded_model, "coef_")
+
+    def test_load_model_not_found(self, tmp_mlvern_dir):
+        """Test load_model raises error for non-existent run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        with pytest.raises(ValueError):
+            forge.load_model("nonexistent_run")
+
+    def test_load_model_makes_predictions(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test that loaded model can make predictions."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        loaded_model = forge.load_model(run_id)
+        predictions = loaded_model.predict(X_val)
+
+        assert predictions is not None
+        assert len(predictions) == len(X_val)
+
+
+# ============================================================================
+# TESTS: New Forge API - Model Registry
+# ============================================================================
+
+
+class TestForgeModelRegistry:
+    """Tests for Forge model registry methods."""
+
+    def test_register_model_success(self, tmp_mlvern_dir, logistic_model):
+        """Test registering a model."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        metadata = {
+            "model_name": "logistic_regression_v1",
+            "description": "Test model",
+            "hyperparameters": {"C": 1.0},
+        }
+
+        model_id = forge.register_model(logistic_model, metadata)
+
+        assert model_id is not None
+        assert "model_" in model_id
+
+        # Verify model was saved
+        model_path = os.path.join(forge.mlvern_dir, "models", f"{model_id}.pkl")
+        assert os.path.exists(model_path)
+
+    def test_register_model_custom_id(self, tmp_mlvern_dir, logistic_model):
+        """Test registering a model with custom ID."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        metadata = {"model_name": "test_model"}
+        custom_id = "custom_model_v1"
+
+        model_id = forge.register_model(logistic_model, metadata, model_id=custom_id)
+
+        assert model_id == custom_id
+
+    def test_list_models(self, tmp_mlvern_dir, logistic_model, forest_model):
+        """Test listing registered models."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        models = forge.list_models()
+        assert len(models) == 0
+
+        id1 = forge.register_model(
+            logistic_model, {"name": "lr"}, model_id="model_lr_v1"
+        )
+        id2 = forge.register_model(forest_model, {"name": "rf"}, model_id="model_rf_v1")
+
+        models = forge.list_models()
+        assert len(models) == 2
+        assert id1 in models
+        assert id2 in models
+
+    def test_register_model_metadata_saved(self, tmp_mlvern_dir, logistic_model):
+        """Test that model metadata is saved alongside the model."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        metadata = {
+            "model_name": "test_model",
+            "version": "1.0",
+            "source_run_id": "run_123",
+        }
+
+        model_id = forge.register_model(logistic_model, metadata)
+
+        model_path = os.path.join(forge.mlvern_dir, "models", f"{model_id}.pkl")
+        metadata_path = model_path.replace(".pkl", "_metadata.json")
+
+        assert os.path.exists(metadata_path)
+
+        with open(metadata_path) as f:
+            saved_metadata = json.load(f)
+
+        assert saved_metadata["model_name"] == "test_model"
+        assert saved_metadata["version"] == "1.0"
+
+    def test_tag_run_success(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test tagging a run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        tags = {"experiment": "baseline", "status": "approved"}
+        forge.tag_run(run_id, tags)
+
+        retrieved_tags = forge.get_run_tags(run_id)
+
+        assert retrieved_tags["experiment"] == "baseline"
+        assert retrieved_tags["status"] == "approved"
+
+    def test_tag_run_merge_tags(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test that tagging merges with existing tags."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        forge.tag_run(run_id, {"tag1": "value1"})
+        forge.tag_run(run_id, {"tag2": "value2"})
+
+        tags = forge.get_run_tags(run_id)
+
+        assert tags["tag1"] == "value1"
+        assert tags["tag2"] == "value2"
+
+    def test_get_run_tags_nonexistent_run(self, tmp_mlvern_dir):
+        """Test getting tags for non-existent run returns empty dict."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        tags = forge.get_run_tags("nonexistent_run")
+
+        assert tags == {}
+
+
+# ============================================================================
+# TESTS: New Forge API - Deletion & Cleanup
+# ============================================================================
+
+
+class TestForgeCleanup:
+    """Tests for Forge cleanup and deletion methods."""
+
+    def test_remove_run_requires_confirmation(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test remove_run requires confirm=True."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        result = forge.remove_run(run_id, confirm=False)
+
+        assert result is False
+
+        # Verify run still exists
+        assert run_id in forge.list_runs()
+
+    def test_remove_run_success(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test removing a run with confirmation."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        result = forge.remove_run(run_id, confirm=True)
+
+        assert result is True
+        assert run_id not in forge.list_runs()
+
+        run_path = os.path.join(forge.mlvern_dir, "runs", run_id)
+        assert not os.path.exists(run_path)
+
+    def test_remove_run_not_found(self, tmp_mlvern_dir):
+        """Test remove_run handles non-existent run."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        result = forge.remove_run("nonexistent_run", confirm=True)
+
+        assert result is False
+
+    def test_prune_datasets_requires_confirmation(self, tmp_mlvern_dir, sample_df):
+        """Test prune_datasets requires confirm=True."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        result = forge.prune_datasets(older_than_days=0, confirm=False)
+
+        assert result == []
+        assert dataset_hash in forge.list_datasets()
+
+    def test_prune_datasets_no_old_datasets(self, tmp_mlvern_dir, sample_df):
+        """Test prune_datasets when no datasets are old enough."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        result = forge.prune_datasets(older_than_days=365, confirm=True)
+
+        assert result == []
+        assert dataset_hash in forge.list_datasets()
+
+    def test_get_project_stats(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test getting project statistics."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        forge.register_model(logistic_model, {"name": "test"})
+
+        stats = forge.get_project_stats()
+
+        assert stats["project"] == "project"
+        assert stats["datasets_count"] == 1
+        assert stats["runs_count"] == 1
+        assert stats["models_count"] == 1
+        assert "total_size_mb" in stats
+
+
+# ============================================================================
+# TESTS: New Forge API - Evaluation & Prediction
+# ============================================================================
+
+
+class TestForgeEvaluation:
+    """Tests for Forge evaluation and prediction methods."""
+
+    def test_predict_with_run_id(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test prediction using run_id."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        predictions = forge.predict(run_id, X_val)
+
+        assert predictions is not None
+        assert len(predictions) == len(X_val)
+
+    def test_predict_with_model_object(
+        self, sample_train_data, sample_val_data, logistic_model
+    ):
+        """Test prediction using model object directly."""
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        logistic_model.fit(X_train, y_train)
+        forge = Forge("project")
+
+        predictions = forge.predict(logistic_model, X_val)
+
+        assert predictions is not None
+        assert len(predictions) == len(X_val)
+
+    def test_evaluate_with_run_id(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test evaluation using run_id."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        result = forge.evaluate(run_id, X_val, y_val)
+
+        assert "metrics" in result
+        assert "accuracy" in result["metrics"]
+        assert "precision" in result["metrics"]
+        assert "recall" in result["metrics"]
+        assert "f1" in result["metrics"]
+
+    def test_evaluate_with_model_object(
+        self, sample_train_data, sample_val_data, logistic_model, tmp_path
+    ):
+        """Test evaluation using model object directly."""
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        logistic_model.fit(X_train, y_train)
+        forge = Forge("project")
+
+        output_dir = os.path.join(str(tmp_path), "evaluation")
+        result = forge.evaluate(logistic_model, X_val, y_val, output_dir=output_dir)
+
+        assert "metrics" in result
+        assert "accuracy" in result["metrics"]
+        assert isinstance(result["metrics"]["accuracy"], float)
+
+    def test_evaluate_saves_report(
+        self,
+        tmp_mlvern_dir,
+        sample_df,
+        sample_train_data,
+        sample_val_data,
+        logistic_model,
+    ):
+        """Test that evaluation saves a report file."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        X_train, y_train = sample_train_data
+        X_val, y_val = sample_val_data
+
+        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+
+        forge.evaluate(run_id, X_val, y_val)
+
+        eval_report_path = os.path.join(
+            forge.mlvern_dir, "runs", run_id, "evaluation", "evaluation_report.json"
+        )
+        assert os.path.exists(eval_report_path)
+
+        with open(eval_report_path) as f:
+            report = json.load(f)
+
+        assert "metrics" in report
+
+
+# ============================================================================
+# TESTS: New Forge API - Dataset Saving & Loading
+# ============================================================================
+
+
+class TestForgeDatasetSaveLoad:
+    """Tests for Forge dataset save/load methods."""
+
+    def test_save_dataset(self, tmp_mlvern_dir, sample_df):
+        """Test saving a dataset."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        result = forge.save_dataset(sample_df, dataset_hash, name="test_dataset")
+
+        assert result["dataset_hash"] == dataset_hash
+        assert result["saved"] is True
+        assert result["metadata"]["name"] == "test_dataset"
+
+    def test_save_dataset_with_tags(self, tmp_mlvern_dir, sample_df):
+        """Test saving dataset with tags."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        tags = {"experiment": "exp1", "version": "v1"}
+        result = forge.save_dataset(sample_df, dataset_hash, tags=tags)
+
+        assert result["metadata"]["tags"] == tags
+
+    def test_load_dataset_by_hash(self, tmp_mlvern_dir, sample_df):
+        """Test loading dataset by hash."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        forge.save_dataset(sample_df, dataset_hash)
+
+        loaded_df = forge.load_dataset_by_hash(dataset_hash)
+
+        assert loaded_df.shape == sample_df.shape
+        assert list(loaded_df.columns) == list(sample_df.columns)
+
+    def test_load_dataset_by_hash_not_found(self, tmp_mlvern_dir):
+        """Test loading non-existent dataset raises error."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        with pytest.raises(FileNotFoundError):
+            forge.load_dataset_by_hash("nonexistent_hash")
+
+    def test_get_dataset_report(self, tmp_mlvern_dir, sample_df):
+        """Test getting aggregated dataset report."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        fp, _ = forge.register_dataset(sample_df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        report = forge.get_dataset_report(dataset_hash)
+
+        assert "dataset_hash" in report
+        assert report["dataset_hash"] == dataset_hash
+        assert "metadata" in report
+        assert "inspection" in report
+        assert "statistics" in report
+        assert "risk" in report
+
+    def test_load_dataset_preserves_dtypes(self, tmp_mlvern_dir):
+        """Test that loading preserves data types."""
+        forge = Forge("project", tmp_mlvern_dir)
+        forge.init()
+
+        df = pd.DataFrame(
+            {
+                "int_col": [1, 2, 3],
+                "float_col": [1.1, 2.2, 3.3],
+                "str_col": ["a", "b", "c"],
+                "target": [0, 1, 0],
+            }
+        )
+
+        fp, _ = forge.register_dataset(df, "target")
+        dataset_hash = fp["dataset_hash"]
+
+        forge.save_dataset(df, dataset_hash)
+        loaded_df = forge.load_dataset_by_hash(dataset_hash)
+
+        assert loaded_df["int_col"].dtype == df["int_col"].dtype
+        assert loaded_df["float_col"].dtype == df["float_col"].dtype
+        assert loaded_df["str_col"].dtype == df["str_col"].dtype

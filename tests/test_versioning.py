@@ -760,3 +760,301 @@ class TestVersioningIntegration:
 
         assert saved_config1["model"] == "logistic"
         assert saved_config2["model"] == "rf"
+
+
+# ============================================================================
+# TESTS: Registry - Model Management
+# ============================================================================
+
+
+class TestRegistryModelManagement:
+    """Tests for model registry functions."""
+
+    def test_register_model_metadata(self, tmp_mlvern_dir):
+        """Test registering model metadata in registry."""
+        from mlvern.utils.registry import list_models_registry, register_model_metadata
+
+        init_registry(tmp_mlvern_dir, "test_project")
+
+        metadata = {
+            "model_name": "lr_v1",
+            "hyperparameters": {"C": 1.0},
+            "source_run_id": "run_123",
+        }
+
+        register_model_metadata(tmp_mlvern_dir, "model_001", metadata)
+
+        models = list_models_registry(tmp_mlvern_dir)
+
+        assert "model_001" in models
+        assert models["model_001"]["model_name"] == "lr_v1"
+        assert models["model_001"]["source_run_id"] == "run_123"
+        assert "registered_at" in models["model_001"]
+
+    def test_list_models_empty(self, tmp_mlvern_dir):
+        """Test list_models_registry returns empty dict initially."""
+        from mlvern.utils.registry import list_models_registry
+
+        init_registry(tmp_mlvern_dir, "test_project")
+
+        models = list_models_registry(tmp_mlvern_dir)
+
+        assert models == {}
+
+    def test_list_models_multiple(self, tmp_mlvern_dir):
+        """Test listing multiple registered models."""
+        from mlvern.utils.registry import list_models_registry, register_model_metadata
+
+        init_registry(tmp_mlvern_dir, "test_project")
+
+        register_model_metadata(tmp_mlvern_dir, "model_001", {"name": "lr"})
+        register_model_metadata(tmp_mlvern_dir, "model_002", {"name": "rf"})
+
+        models = list_models_registry(tmp_mlvern_dir)
+
+        assert len(models) == 2
+        assert "model_001" in models
+        assert "model_002" in models
+
+
+# ============================================================================
+# TESTS: Registry - Run Tagging
+# ============================================================================
+
+
+class TestRegistryRunTagging:
+    """Tests for run tagging and search functions."""
+
+    def test_tag_run_success(
+        self,
+        initialized_mlvern_dir,
+        sample_df,
+        sample_model,
+        sample_config,
+    ):
+        """Test adding tags to a run."""
+        from mlvern.data.fingerprint import fingerprint_dataset
+        from mlvern.utils.registry import get_run_tags, tag_run
+
+        fp = fingerprint_dataset(sample_df, "target")
+        run_id = create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.95}, sample_config
+        )
+
+        tags = {"experiment": "baseline", "status": "approved"}
+        tag_run(initialized_mlvern_dir, run_id, tags)
+
+        retrieved_tags = get_run_tags(initialized_mlvern_dir, run_id)
+
+        assert retrieved_tags["experiment"] == "baseline"
+        assert retrieved_tags["status"] == "approved"
+
+    def test_tag_run_not_found(self, tmp_mlvern_dir):
+        """Test tagging non-existent run raises error."""
+        from mlvern.utils.registry import tag_run
+
+        init_registry(tmp_mlvern_dir, "test_project")
+
+        with pytest.raises(KeyError):
+            tag_run(tmp_mlvern_dir, "nonexistent_run", {"tag": "value"})
+
+    def test_get_run_tags_empty(
+        self, initialized_mlvern_dir, sample_df, sample_model, sample_config
+    ):
+        """Test getting tags from run with no tags."""
+        from mlvern.data.fingerprint import fingerprint_dataset
+        from mlvern.utils.registry import get_run_tags
+
+        fp = fingerprint_dataset(sample_df, "target")
+        run_id = create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.95}, sample_config
+        )
+
+        tags = get_run_tags(initialized_mlvern_dir, run_id)
+
+        assert tags == {}
+
+    def test_tag_run_merge_tags(
+        self, initialized_mlvern_dir, sample_df, sample_model, sample_config
+    ):
+        """Test that tagging merges with existing tags."""
+        from mlvern.data.fingerprint import fingerprint_dataset
+        from mlvern.utils.registry import get_run_tags, tag_run
+
+        fp = fingerprint_dataset(sample_df, "target")
+        run_id = create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.95}, sample_config
+        )
+
+        tag_run(initialized_mlvern_dir, run_id, {"tag1": "value1"})
+        tag_run(initialized_mlvern_dir, run_id, {"tag2": "value2"})
+
+        tags = get_run_tags(initialized_mlvern_dir, run_id)
+
+        assert tags["tag1"] == "value1"
+        assert tags["tag2"] == "value2"
+
+    def test_search_runs_by_tag(
+        self, initialized_mlvern_dir, sample_df, sample_model, sample_config
+    ):
+        """Test searching runs by tag key-value pair."""
+        from mlvern.data.fingerprint import fingerprint_dataset
+        from mlvern.utils.registry import search_runs_by_tag, tag_run
+
+        fp = fingerprint_dataset(sample_df, "target")
+
+        run_id1 = create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.95}, sample_config
+        )
+        run_id2 = create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.93}, sample_config
+        )
+
+        tag_run(initialized_mlvern_dir, run_id1, {"status": "approved"})
+        tag_run(initialized_mlvern_dir, run_id2, {"status": "review"})
+        tag_run(initialized_mlvern_dir, run_id1, {"experiment": "exp1"})
+
+        approved_runs = search_runs_by_tag(initialized_mlvern_dir, "status", "approved")
+
+        assert run_id1 in approved_runs
+        assert run_id2 not in approved_runs
+
+    def test_search_runs_by_tag_no_matches(
+        self,
+        initialized_mlvern_dir,
+        sample_df,
+        sample_model,
+        sample_config,
+    ):
+        """Test search with no matching tags."""
+        from mlvern.data.fingerprint import fingerprint_dataset
+        from mlvern.utils.registry import search_runs_by_tag
+
+        fp = fingerprint_dataset(sample_df, "target")
+        create_run(
+            initialized_mlvern_dir, fp, sample_model, {"accuracy": 0.95}, sample_config
+        )
+
+        results = search_runs_by_tag(initialized_mlvern_dir, "nonexistent", "value")
+
+        assert results == []
+
+
+# ============================================================================
+# TESTS: Artifact Utilities
+# ============================================================================
+
+
+class TestArtifactUtilities:
+    """Tests for artifact save/load utilities."""
+
+    def test_save_model_safe(self, tmp_path, sample_model):
+        """Test saving a model with save_model_safe."""
+        from mlvern.utils.artifact import load_model_safe, save_model_safe
+
+        model_path = str(tmp_path / "model.pkl")
+        save_model_safe(sample_model, model_path)
+
+        assert os.path.exists(model_path)
+
+        loaded = load_model_safe(model_path, safe=False)
+        assert loaded is not None
+
+    def test_save_model_with_metadata(self, tmp_path, sample_model):
+        """Test saving model with metadata."""
+        from mlvern.utils.artifact import get_model_metadata, save_model_safe
+
+        model_path = str(tmp_path / "model.pkl")
+        metadata = {"version": "1.0", "accuracy": 0.95}
+
+        save_model_safe(sample_model, model_path, metadata=metadata)
+
+        retrieved_metadata = get_model_metadata(model_path)
+
+        assert retrieved_metadata["version"] == "1.0"
+        assert retrieved_metadata["accuracy"] == 0.95
+
+    def test_get_model_metadata_no_file(self, tmp_path):
+        """Test getting metadata when metadata file doesn't exist."""
+        from mlvern.utils.artifact import get_model_metadata
+
+        model_path = str(tmp_path / "nonexistent.pkl")
+        metadata = get_model_metadata(model_path)
+
+        assert metadata == {}
+
+    def test_load_model_safe_not_found(self, tmp_path):
+        """Test load_model_safe raises error for missing file."""
+        from mlvern.utils.artifact import load_model_safe
+
+        model_path = str(tmp_path / "nonexistent.pkl")
+
+        with pytest.raises(FileNotFoundError):
+            load_model_safe(model_path)
+
+    def test_remove_directory_safe_requires_confirm(self, tmp_path):
+        """Test remove_directory_safe requires confirm=True."""
+        from mlvern.utils.artifact import remove_directory_safe
+
+        test_dir = tmp_path / "to_remove"
+        test_dir.mkdir()
+
+        result = remove_directory_safe(str(test_dir), confirm=False)
+
+        assert result is False
+        assert test_dir.exists()
+
+    def test_remove_directory_safe_success(self, tmp_path):
+        """Test removing directory with confirmation."""
+        from mlvern.utils.artifact import remove_directory_safe
+
+        test_dir = tmp_path / "to_remove"
+        test_dir.mkdir()
+        (test_dir / "file.txt").write_text("test")
+
+        result = remove_directory_safe(str(test_dir), confirm=True)
+
+        assert result is True
+        assert not test_dir.exists()
+
+    def test_get_directory_size_mb(self, tmp_path):
+        """Test calculating directory size."""
+        from mlvern.utils.artifact import get_directory_size_mb
+
+        test_dir = tmp_path / "test_size"
+        test_dir.mkdir()
+
+        file1 = test_dir / "file1.txt"
+        file1.write_text("a" * 1000)
+
+        file2 = test_dir / "file2.txt"
+        file2.write_text("b" * 2000)
+
+        size_mb = get_directory_size_mb(str(test_dir))
+
+        assert size_mb > 0
+        assert size_mb < 1
+
+    def test_get_directory_created_time(self, tmp_path):
+        """Test getting directory creation time."""
+        from mlvern.utils.artifact import get_directory_created_time
+
+        test_dir = tmp_path / "test_time"
+        test_dir.mkdir()
+
+        created_time = get_directory_created_time(str(test_dir))
+
+        assert created_time is not None
+        from datetime import datetime
+
+        assert isinstance(created_time, datetime)
+
+    def test_get_directory_created_time_nonexistent(self, tmp_path):
+        """Test getting time for non-existent directory."""
+        from mlvern.utils.artifact import get_directory_created_time
+
+        nonexistent = tmp_path / "nonexistent"
+
+        result = get_directory_created_time(str(nonexistent))
+
+        assert result is None
