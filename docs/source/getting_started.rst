@@ -31,4 +31,4 @@ Once installed, you can verify the installation by importing mlvern in a Python 
    import mlvern
    print(mlvern.__version__)
 
-You're now ready to start using mlvern for your machine learning projects! For more detailed usage instructions, refer to the :doc:`Quickstart Guide <quickstart>`_.
+Now that are all set up, Let's hop on a :doc:`quick test drive of mlvern <quickstart>`, shall we?

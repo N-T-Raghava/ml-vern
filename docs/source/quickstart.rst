@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-This is a quick 5-minute beginner guide to getting used to mlvern for managing your machine learning models and experiments.
+This is a quick 5-minute beginner guide to getting used to mlvern for managing your machine learning models and experiments. Fasten your seat belts, and let's dive in!
 
 Initializing the Project
 -------------------------------------
