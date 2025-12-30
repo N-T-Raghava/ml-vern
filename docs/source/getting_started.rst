@@ -31,25 +31,4 @@ Once installed, you can verify the installation by importing mlvern in a Python 
    import mlvern
    print(mlvern.__version__)
 
-Example Usage
---------------------------------------------------
-
-Here is a simple example to get you started with mlvern. This example confirms 
-
-.. code-block:: python
-
-   from mlvern import MlVern
-
-   # Initialize a new mlvern repository
-   mlvern_repo = MlVern()
-   mlvern_repo.init()
-
-   # Track a new model version
-   model_path = 'path/to/your/model.pkl'
-   version = 'v1.0'
-   mlvern_repo.track(model_path, version)
-
-   # List all tracked model versions
-   versions = mlvern_repo.list_versions()
-   print("Tracked model versions:", versions)
-
+You're now ready to start using mlvern for your machine learning projects! For more detailed usage instructions, refer to the :doc:`Quickstart Guide <quickstart>`_.

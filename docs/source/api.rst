@@ -1,16 +1,20 @@
 API
 ==========================================================
+
 API Reference
 ===================
+
 This section provides a comprehensive reference for the mlvern library's API, detailing the available classes, methods, and functions for version control in machine learning projects.
+
 Module Overview
--------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------
 
 The mlvern library consists of several modules that facilitate version control for machine learning models. Below is an overview of the main modules:
 - `mlvern.core`: Contains the core functionalities for initializing repositories, tracking models, and managing versions.
 - `mlvern.utils`: Provides utility functions for file handling, logging, and configuration management.
+
 Class and Method Reference
-----------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------
 
 Here are some of the key classes and methods available in the mlvern library:
 - `mlvern.core.MlVern`: The main class for interacting with the mlvern system.
