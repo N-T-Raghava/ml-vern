@@ -67,7 +67,7 @@ jobs:
       run: isort mlvern/ tests/ --check-only
 
     - name: Lint with flake8
-      run: flake8 mlvern/ tests/
+      run: flake8 mlvern/ tests/ --max-line-length=88
 
 
   build:
