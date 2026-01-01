@@ -24,7 +24,9 @@ from mlvern.data.register import register_dataset
 from mlvern.utils.hashing import hash_object
 from mlvern.utils.registry import (
     init_registry,
+    list_models_registry,
     load_registry,
+    register_model_metadata,
     save_registry,
 )
 from mlvern.version.run_manager import create_run
@@ -772,7 +774,6 @@ class TestRegistryModelManagement:
 
     def test_register_model_metadata(self, tmp_mlvern_dir):
         """Test registering model metadata in registry."""
-        from mlvern.utils.registry import list_models_registry, register_model_metadata
 
         init_registry(tmp_mlvern_dir, "test_project")
 
@@ -803,7 +804,6 @@ class TestRegistryModelManagement:
 
     def test_list_models_multiple(self, tmp_mlvern_dir):
         """Test listing multiple registered models."""
-        from mlvern.utils.registry import list_models_registry, register_model_metadata
 
         init_registry(tmp_mlvern_dir, "test_project")
 

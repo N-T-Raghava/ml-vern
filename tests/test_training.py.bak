@@ -102,7 +102,9 @@ class TestTrainModel:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        model, metrics = train_model(logistic_model, X_train, y_train, X_val, y_val)
+        model, metrics = train_model(
+            logistic_model, X_train, y_train, X_val, y_val
+        )
 
         assert model is not None
         assert "accuracy" in metrics
@@ -115,15 +117,17 @@ class TestTrainModel:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        model, metrics = train_model(forest_model, X_train, y_train, X_val, y_val)
-
-        # Manually calculate expected accuracy
+        model, metrics = train_model(
+            forest_model, X_train, y_train, X_val, y_val
+        )
         preds = model.predict(X_val)
         expected_accuracy = accuracy_score(y_val, preds)
 
         assert metrics["accuracy"] == expected_accuracy
 
-    def test_train_model_returns_fitted_model(self, sample_train_data, logistic_model):
+    def test_train_model_returns_fitted_model(
+        self, sample_train_data, logistic_model
+    ):
         """Test that returned model is fitted."""
         X, y = sample_train_data
         model, _ = train_model(logistic_model, X, y)
@@ -132,7 +136,9 @@ class TestTrainModel:
         assert hasattr(model, "coef_")
         assert model.coef_ is not None
 
-    def test_train_model_different_algorithms(self, sample_train_data, sample_val_data):
+    def test_train_model_different_algorithms(
+        self, sample_train_data, sample_val_data
+    ):
         """Test training with different model algorithms."""
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
@@ -171,7 +177,9 @@ class TestForgeInitialization:
         forge = Forge("test_project", tmp_mlvern_dir)
         assert forge.project == "test_project"
         assert forge.base_dir == tmp_mlvern_dir
-        assert forge.mlvern_dir == os.path.join(tmp_mlvern_dir, ".mlvern_test_project")
+        assert forge.mlvern_dir == os.path.join(
+            tmp_mlvern_dir, ".mlvern_test_project"
+        )
 
     def test_forge_init_method(self, tmp_mlvern_dir):
         """Test Forge.init() creates required directories."""
@@ -254,7 +262,11 @@ class TestForgeDatasetOperations:
         forge.init()
 
         df1 = pd.DataFrame({"a": [1, 2, 3], "target": [0, 1, 0]})
-        df2 = pd.DataFrame({"b": [4, 5, 6], "c": [7, 8, 9], "target": [1, 0, 1]})
+        df2 = pd.DataFrame({
+            "b": [4, 5, 6],
+            "c": [7, 8, 9],
+            "target": [1, 0, 1]
+        })
 
         fp1, _ = forge.register_dataset(df1, "target")
         fp2, _ = forge.register_dataset(df2, "target")
@@ -341,8 +353,9 @@ class TestForgeTrainingRun:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
-
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
         model_path = os.path.join(
             forge.mlvern_dir, "runs", run_id, "artifacts", "model.pkl"
         )
@@ -368,7 +381,9 @@ class TestForgeTrainingRun:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         meta_path = os.path.join(forge.mlvern_dir, "runs", run_id, "meta.json")
         with open(meta_path) as f:
@@ -399,7 +414,9 @@ class TestForgeTrainingRun:
             logistic_model, X_train, y_train, X_val, y_val, config, fp
         )
 
-        config_path = os.path.join(forge.mlvern_dir, "runs", run_id, "config.json")
+        config_path = os.path.join(
+            forge.mlvern_dir, "runs", run_id, "config.json"
+        )
         with open(config_path) as f:
             saved_config = json.load(f)
 
@@ -425,7 +442,9 @@ class TestForgeTrainingRun:
             logistic_model, X_train, y_train, X_val, y_val, {}, fp
         )
 
-        metrics_path = os.path.join(forge.mlvern_dir, "runs", run_id, "metrics.json")
+        metrics_path = os.path.join(
+            forge.mlvern_dir, "runs", run_id, "metrics.json"
+        )
         with open(metrics_path) as f:
             saved_metrics = json.load(f)
 
@@ -451,7 +470,9 @@ class TestForgeTrainingRun:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         runs = forge.list_runs()
         assert len(runs) == 1
@@ -474,8 +495,12 @@ class TestForgeTrainingRun:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id1, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
-        run_id2, _ = forge.run(forest_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id1, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
+        run_id2, _ = forge.run(
+            forest_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         runs = forge.list_runs()
         assert len(runs) == 2
@@ -595,7 +620,9 @@ class TestRegistrySaveOperations:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         # Reload registry from disk to verify persistence
         registry = load_registry(forge.mlvern_dir)
@@ -733,7 +760,9 @@ class TestForgeRunAccessors:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         run_info = forge.get_run(run_id)
 
@@ -793,7 +822,9 @@ class TestForgeRunAccessors:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         artifacts = forge.get_run_artifacts(run_id)
 
@@ -820,7 +851,10 @@ class TestForgeRunAccessors:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train,
+            X_val, y_val, {}, fp
+        )
 
         loaded_model = forge.load_model(run_id)
 
@@ -852,7 +886,8 @@ class TestForgeRunAccessors:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         loaded_model = forge.load_model(run_id)
         predictions = loaded_model.predict(X_val)
@@ -886,7 +921,9 @@ class TestForgeModelRegistry:
         assert "model_" in model_id
 
         # Verify model was saved
-        model_path = os.path.join(forge.mlvern_dir, "models", f"{model_id}.pkl")
+        model_path = os.path.join(
+            forge.mlvern_dir, "models", f"{model_id}.pkl"
+        )
         assert os.path.exists(model_path)
 
     def test_register_model_custom_id(self, tmp_mlvern_dir, logistic_model):
@@ -897,7 +934,9 @@ class TestForgeModelRegistry:
         metadata = {"model_name": "test_model"}
         custom_id = "custom_model_v1"
 
-        model_id = forge.register_model(logistic_model, metadata, model_id=custom_id)
+        model_id = forge.register_model(
+            logistic_model, metadata, model_id=custom_id
+        )
 
         assert model_id == custom_id
 
@@ -912,14 +951,18 @@ class TestForgeModelRegistry:
         id1 = forge.register_model(
             logistic_model, {"name": "lr"}, model_id="model_lr_v1"
         )
-        id2 = forge.register_model(forest_model, {"name": "rf"}, model_id="model_rf_v1")
+        id2 = forge.register_model(
+            forest_model, {"name": "rf"}, model_id="model_rf_v1"
+        )
 
         models = forge.list_models()
         assert len(models) == 2
         assert id1 in models
         assert id2 in models
 
-    def test_register_model_metadata_saved(self, tmp_mlvern_dir, logistic_model):
+    def test_register_model_metadata_saved(
+        self, tmp_mlvern_dir, logistic_model
+    ):
         """Test that model metadata is saved alongside the model."""
         forge = Forge("project", tmp_mlvern_dir)
         forge.init()
@@ -932,7 +975,9 @@ class TestForgeModelRegistry:
 
         model_id = forge.register_model(logistic_model, metadata)
 
-        model_path = os.path.join(forge.mlvern_dir, "models", f"{model_id}.pkl")
+        model_path = os.path.join(
+            forge.mlvern_dir, "models", f"{model_id}.pkl"
+        )
         metadata_path = model_path.replace(".pkl", "_metadata.json")
 
         assert os.path.exists(metadata_path)
@@ -959,7 +1004,8 @@ class TestForgeModelRegistry:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         tags = {"experiment": "baseline", "status": "approved"}
         forge.tag_run(run_id, tags)
@@ -985,7 +1031,8 @@ class TestForgeModelRegistry:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         forge.tag_run(run_id, {"tag1": "value1"})
         forge.tag_run(run_id, {"tag2": "value2"})
@@ -1029,7 +1076,8 @@ class TestForgeCleanup:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         result = forge.remove_run(run_id, confirm=False)
 
@@ -1054,7 +1102,8 @@ class TestForgeCleanup:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         result = forge.remove_run(run_id, confirm=True)
 
@@ -1073,7 +1122,9 @@ class TestForgeCleanup:
 
         assert result is False
 
-    def test_prune_datasets_requires_confirmation(self, tmp_mlvern_dir, sample_df):
+    def test_prune_datasets_requires_confirmation(
+        self, tmp_mlvern_dir, sample_df
+    ):
         """Test prune_datasets requires confirm=True."""
         forge = Forge("project", tmp_mlvern_dir)
         forge.init()
@@ -1152,7 +1203,8 @@ class TestForgeEvaluation:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         predictions = forge.predict(run_id, X_val)
 
@@ -1190,7 +1242,8 @@ class TestForgeEvaluation:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(logistic_model, X_train,
+                              y_train, X_val, y_val, {}, fp)
 
         result = forge.evaluate(run_id, X_val, y_val)
 
@@ -1211,7 +1264,9 @@ class TestForgeEvaluation:
         forge = Forge("project")
 
         output_dir = os.path.join(str(tmp_path), "evaluation")
-        result = forge.evaluate(logistic_model, X_val, y_val, output_dir=output_dir)
+        result = forge.evaluate(
+            logistic_model, X_val, y_val, output_dir=output_dir
+        )
 
         assert "metrics" in result
         assert "accuracy" in result["metrics"]
@@ -1233,12 +1288,15 @@ class TestForgeEvaluation:
         X_train, y_train = sample_train_data
         X_val, y_val = sample_val_data
 
-        run_id, _ = forge.run(logistic_model, X_train, y_train, X_val, y_val, {}, fp)
+        run_id, _ = forge.run(
+            logistic_model, X_train, y_train, X_val, y_val, {}, fp
+        )
 
         forge.evaluate(run_id, X_val, y_val)
 
         eval_report_path = os.path.join(
-            forge.mlvern_dir, "runs", run_id, "evaluation", "evaluation_report.json"
+            forge.mlvern_dir, "runs", run_id, "evaluation",
+            "evaluation_report.json"
         )
         assert os.path.exists(eval_report_path)
 
@@ -1264,7 +1322,9 @@ class TestForgeDatasetSaveLoad:
         fp, _ = forge.register_dataset(sample_df, "target")
         dataset_hash = fp["dataset_hash"]
 
-        result = forge.save_dataset(sample_df, dataset_hash, name="test_dataset")
+        result = forge.save_dataset(
+            sample_df, dataset_hash, name="test_dataset"
+        )
 
         assert result["dataset_hash"] == dataset_hash
         assert result["saved"] is True

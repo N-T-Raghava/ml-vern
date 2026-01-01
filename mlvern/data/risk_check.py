@@ -30,9 +30,7 @@ def sensitive_attribute_imbalance(
         if col not in df.columns:
             result[col] = {"error": "not_present"}
             continue
-        result[col] = df[col].value_counts(
-            normalize=True
-        ).to_dict()
+        result[col] = df[col].value_counts(normalize=True).to_dict()
     return result
 
 
@@ -61,8 +59,9 @@ def sampling_bias(
             c_cat = pd.cut(current[col], bins=bins, include_lowest=True)
             tbl = pd.crosstab(b_cat, c_cat)
         else:
-            tbl = pd.crosstab(baseline[col].fillna("__NA__"),
-                              current[col].fillna("__NA__"))
+            tbl = pd.crosstab(
+                baseline[col].fillna("__NA__"), current[col].fillna("__NA__")
+            )
         try:
             chi2, p, _, _ = stats.chi2_contingency(tbl)
             report[col] = {"chi2": float(chi2), "pvalue": float(p)}
@@ -71,8 +70,9 @@ def sampling_bias(
     return report
 
 
-def target_leakage_detection(df: pd.DataFrame, target: str,
-                             threshold: float = 0.99) -> Dict[str, Any]:
+def target_leakage_detection(
+    df: pd.DataFrame, target: str, threshold: float = 0.99
+) -> Dict[str, Any]:
     out = {}
     if target not in df.columns:
         return {"error": f"Target '{target}' not found"}
@@ -116,8 +116,9 @@ def data_drift(
                 report[col] = {"ks_stat": float(stat), "pvalue": float(p)}
             else:
                 # chi2 on contingency table of categories
-                tbl = pd.crosstab(baseline[col].fillna("__NA__"),
-                                  current[col].fillna("__NA__"))
+                tbl = pd.crosstab(
+                    baseline[col].fillna("__NA__"), current[col].fillna("__NA__")
+                )
                 chi2, p, _, _ = stats.chi2_contingency(tbl)
                 report[col] = {"chi2": float(chi2), "pvalue": float(p)}
         except Exception:
@@ -125,8 +126,9 @@ def data_drift(
     return report
 
 
-def train_test_mismatch(train: pd.DataFrame, test: pd.DataFrame,
-                        cols: Optional[List[str]] = None) -> Dict[str, Any]:
+def train_test_mismatch(
+    train: pd.DataFrame, test: pd.DataFrame, cols: Optional[List[str]] = None
+) -> Dict[str, Any]:
     """Wrapper around data_drift to check train vs test mismatch."""
     return data_drift(train, test, cols)
 

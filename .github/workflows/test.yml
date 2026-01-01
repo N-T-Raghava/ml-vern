@@ -58,16 +58,17 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 black isort
+        pip install black isort flake8
 
-    - name: Format code with black
-      run: black mlvern/ tests/
+    - name: Check formatting with black
+      run: black mlvern/ tests/ --check
 
-    - name: Format imports with isort
-      run: isort mlvern/ tests/
+    - name: Check imports with isort
+      run: isort mlvern/ tests/ --check-only
 
     - name: Lint with flake8
-      run: flake8 mlvern/ tests/ --max-line-length=100
+      run: flake8 mlvern/ tests/
+
 
   build:
     needs: [test, lint]

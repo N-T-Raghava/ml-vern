@@ -13,10 +13,12 @@ def fingerprint_dataset(df: pd.DataFrame, target: str):
         "target": target,
     }
 
-    content_hash = hash_object({
-        "data": df.to_dict(orient="list"),
-        "schema": schema,
-    })
+    content_hash = hash_object(
+        {
+            "data": df.to_dict(orient="list"),
+            "schema": schema,
+        }
+    )
 
     return {
         "dataset_hash": content_hash[:12],  # short hash for paths

@@ -18,7 +18,8 @@ def create_run(
     runs_dir = os.path.join(mlvern_dir, "runs")
     os.makedirs(runs_dir, exist_ok=True)
 
-    run_id = f"run_{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S-%f')}"
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S-%f")
+    run_id = f"run_{timestamp}"
     run_path = os.path.join(runs_dir, run_id)
     os.makedirs(run_path, exist_ok=True)
 

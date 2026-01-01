@@ -1,6 +1,7 @@
 """
 Dataset save/load utilities for efficient storage and retrieval.
 """
+
 import json
 import os
 import pickle
@@ -108,17 +109,13 @@ def get_dataset_report(dataset_path: str) -> Dict[str, Any]:
         return reports
 
     # Load inspection report
-    inspection_path = os.path.join(
-        reports_dir, "data_inspection_report.json"
-    )
+    inspection_path = os.path.join(reports_dir, "data_inspection_report.json")
     if os.path.exists(inspection_path):
         with open(inspection_path, "r") as f:
             reports["inspection"] = json.load(f)
 
     # Load statistics report
-    statistics_path = os.path.join(
-        reports_dir, "statistics_report.json"
-    )
+    statistics_path = os.path.join(reports_dir, "statistics_report.json")
     if os.path.exists(statistics_path):
         with open(statistics_path, "r") as f:
             reports["statistics"] = json.load(f)

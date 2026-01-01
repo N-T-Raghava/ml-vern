@@ -8,6 +8,8 @@ import tempfile
 import pandas as pd
 import pytest
 
+from mlvern.utils.dataset_utils import get_dataset_report, save_dataset_to_path
+
 # ============================================================================
 # TESTS: Environment Utilities
 # ============================================================================
@@ -177,7 +179,6 @@ class TestDatasetUtilities:
 
     def test_get_dataset_report(self, sample_df):
         """Test getting aggregated dataset report."""
-        from mlvern.utils.dataset_utils import get_dataset_report, save_dataset_to_path
 
         with tempfile.TemporaryDirectory() as tmp_path:
             dataset_path = os.path.join(tmp_path, "test_dataset")

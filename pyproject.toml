@@ -44,5 +44,9 @@ line_length = 88
 [tool.black]
 line-length = 88
 
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
 [tool.setuptools.packages.find]
 where = ["."]

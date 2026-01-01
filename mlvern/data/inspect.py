@@ -52,7 +52,7 @@ class DataInspector:
             "cardinality": self._profile_cardinality(),
             "numeric_ranges": self._profile_numeric_ranges(),
             "outliers": self._profile_outliers(),
-            "target_distribution": self._profile_target() if self.target else {},
+            "target_distribution": (self._profile_target() if self.target else {}),
         }
         return profile
 
@@ -74,7 +74,7 @@ class DataInspector:
             "rows": int(self.df.shape[0]),
             "columns": int(self.df.shape[1]),
             "memory_mb": round(
-                self.df.memory_usage(deep=True).sum() / (1024 ** 2),
+                self.df.memory_usage(deep=True).sum() / (1024**2),
                 4,
             ),
             "sparsity_percent": round(
@@ -152,7 +152,7 @@ class DataInspector:
 
         for col in numeric_cols:
             # Use ddof=0 to avoid division-by-zero warnings
-            with np.errstate(divide='ignore', invalid='ignore'):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 std_val = float(self.df[col].std(ddof=0))
                 if pd.isna(std_val):
                     std_val = 0.0
@@ -219,7 +219,7 @@ class DataInspector:
 
         return {
             "target": self.target,
-            "type": "categorical" if target_col.dtype == "object" else "numeric",
+            "type": ("categorical" if target_col.dtype == "object" else "numeric"),
             "class_distribution": class_dist,
             "imbalance_ratio": imbalance_ratio,
             "n_classes": len(class_dist),
@@ -266,7 +266,7 @@ class DataInspector:
         threshold = 0.5
         violations = {}
 
-        missing_pct = (self.df.isnull().sum() / len(self.df) * 100)
+        missing_pct = self.df.isnull().sum() / len(self.df) * 100
         for col in missing_pct[missing_pct >= threshold * 100].index:
             violations[col] = {
                 "missing_percentage": float(missing_pct[col]),
@@ -321,11 +321,13 @@ class DataInspector:
                     if col != self.target:
                         corr = abs(self.df[col].corr(self.df[self.target]))
                         if corr > 0.99:
-                            leakage_indicators.append({
-                                "feature": col,
-                                "correlation": float(corr),
-                                "message": "Perfect correlation with target",
-                            })
+                            leakage_indicators.append(
+                                {
+                                    "feature": col,
+                                    "correlation": float(corr),
+                                    "message": "Perfect correlation with target",
+                                }
+                            )
 
         return {
             "has_leakage_risk": len(leakage_indicators) > 0,
@@ -359,8 +361,8 @@ class DataInspector:
                         "parsed_count": parsed_count,
                         "invalid_dates": invalid_count,
                         "date_range": {
-                            "min": str(parsed.min()) if parsed_count > 0 else None,
-                            "max": str(parsed.max()) if parsed_count > 0 else None,
+                            "min": (str(parsed.min()) if parsed_count > 0 else None),
+                            "max": (str(parsed.max()) if parsed_count > 0 else None),
                         },
                     }
             except Exception:
@@ -398,11 +400,13 @@ class DataInspector:
         # Check missing values
         if profile["missing_values"]["total_missing"] > 0:
             missing_count = profile["missing_values"]["total_missing"]
-            self.report["vulnerabilities"].append({
-                "severity": "WARNING",
-                "type": "MISSING_VALUES",
-                "message": f"{missing_count} missing values detected",
-            })
+            self.report["vulnerabilities"].append(
+                {
+                    "severity": "WARNING",
+                    "type": "MISSING_VALUES",
+                    "message": f"{missing_count} missing values detected",
+                }
+            )
             msg = (
                 "Consider imputing missing values using mean, median, "
                 "or KNN imputation"
@@ -411,11 +415,15 @@ class DataInspector:
 
         # Check duplicates
         if profile["duplicates"]["total"] > 0:
-            self.report["vulnerabilities"].append({
-                "severity": "WARNING",
-                "type": "DUPLICATES",
-                "message": f"{profile['duplicates']['total']} duplicate rows detected",
-            })
+            self.report["vulnerabilities"].append(
+                {
+                    "severity": "WARNING",
+                    "type": "DUPLICATES",
+                    "message": (
+                        f"{profile['duplicates']['total']} " "duplicate rows detected"
+                    ),
+                }
+            )
             self.report["recommendations"].append(
                 "Consider removing or investigating duplicate rows"
             )
@@ -424,35 +432,44 @@ class DataInspector:
         if self.target and self.target in self.df.columns:
             target_dist = profile["target_distribution"]
             if "imbalance_ratio" in target_dist and target_dist["imbalance_ratio"] > 3:
-                self.report["vulnerabilities"].append({
-                    "severity": "WARNING",
-                    "type": "CLASS_IMBALANCE",
-                    "message": f"Imbalance ratio is {target_dist['imbalance_ratio']}",
-                })
+                self.report["vulnerabilities"].append(
+                    {
+                        "severity": "WARNING",
+                        "type": "CLASS_IMBALANCE",
+                        "message": (
+                            f"Imbalance ratio is " f"{target_dist['imbalance_ratio']}"
+                        ),
+                    }
+                )
                 self.report["recommendations"].append(
-                    "Use SMOTE, class weighting, or resampling for class imbalance"
+                    "Use SMOTE, class weighting, or resampling " "for class imbalance"
                 )
 
         # Check null thresholds
         if not validation["null_thresholds"]["is_valid"]:
-            self.report["vulnerabilities"].append({
-                "severity": "CRITICAL",
-                "type": "HIGH_MISSING_THRESHOLD",
-                "message": "Columns exceed 50% missing values",
-            })
+            self.report["vulnerabilities"].append(
+                {
+                    "severity": "CRITICAL",
+                    "type": "HIGH_MISSING_THRESHOLD",
+                    "message": "Columns exceed 50% missing values",
+                }
+            )
             self.report["recommendations"].append(
-                "Consider dropping or heavily imputing columns with >50% missing values"
+                "Consider dropping or heavily imputing columns "
+                "with >50% missing values"
             )
 
         # Check leakage
         if validation["leakage_checks"]["has_leakage_risk"]:
-            self.report["vulnerabilities"].append({
-                "severity": "CRITICAL",
-                "type": "DATA_LEAKAGE",
-                "message": "Perfect correlation detected with target",
-            })
+            self.report["vulnerabilities"].append(
+                {
+                    "severity": "CRITICAL",
+                    "type": "DATA_LEAKAGE",
+                    "message": "Perfect correlation detected with target",
+                }
+            )
             self.report["recommendations"].append(
-                "Investigate and remove features with perfect target correlation"
+                "Investigate and remove features with " "perfect target correlation"
             )
 
     def save_report(self, filename: str = "data_inspection_report.json") -> Path:

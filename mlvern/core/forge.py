@@ -28,9 +28,7 @@ class Forge:
     def __init__(self, project: str, base_dir: str = "."):
         self.project = project
         self.base_dir = os.path.abspath(base_dir)
-        self.mlvern_dir = os.path.join(
-            self.base_dir, f".mlvern_{project}"
-        )
+        self.mlvern_dir = os.path.join(self.base_dir, f".mlvern_{project}")
 
     def init(self):
         """Initialize the mlvern project directory structure."""
@@ -266,8 +264,8 @@ class Forge:
 
         if model_id is None:
             # Auto-generate model ID
-            model_id = f"model_{datetime.now(timezone.utc).strftime(
-                '%Y-%m-%d_%H-%M-%S')}"
+            timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+            model_id = f"model_{timestamp}"
 
         # Create model directory
         models_dir = os.path.join(self.mlvern_dir, "models")
@@ -337,8 +335,9 @@ class Forge:
         # Remove directory
         return remove_directory_safe(run_path, confirm=True)
 
-    def prune_datasets(self, older_than_days: int = 30,
-                       confirm: bool = False) -> List[str]:
+    def prune_datasets(
+        self, older_than_days: int = 30, confirm: bool = False
+    ) -> List[str]:
         """Remove datasets older than specified number of days.
 
         Args:
@@ -357,8 +356,7 @@ class Forge:
         if not os.path.exists(datasets_dir):
             return []
 
-        cutoff_time = datetime.now(
-            timezone.utc) - timedelta(days=older_than_days)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(days=older_than_days)
         removed = []
 
         for dataset_hash in os.listdir(datasets_dir):
@@ -478,9 +476,7 @@ class Forge:
         # Determine output directory
         if output_dir is None:
             if run_id:
-                output_dir = os.path.join(
-                    self.mlvern_dir, "runs", run_id, "evaluation"
-                )
+                output_dir = os.path.join(self.mlvern_dir, "runs", run_id, "evaluation")
             else:
                 output_dir = "./evaluation"
 
@@ -554,9 +550,7 @@ class Forge:
             # Collect generated plots
             for fname in os.listdir(output_dir):
                 if fname.endswith((".png", ".jpg", ".jpeg")):
-                    plot_paths[fname] = os.path.join(
-                        output_dir, fname
-                    )
+                    plot_paths[fname] = os.path.join(output_dir, fname)
         except Exception as e:
             msg = f"Warning: Could not generate plots: {e}"
             print(msg)
@@ -567,9 +561,7 @@ class Forge:
             "plot_paths": plot_paths,
         }
 
-        eval_report_path = os.path.join(
-            output_dir, "evaluation_report.json"
-        )
+        eval_report_path = os.path.join(output_dir, "evaluation_report.json")
         with open(eval_report_path, "w") as f:
             json.dump(report, f, indent=4)
 
@@ -660,6 +652,7 @@ class Forge:
 
         # Also include metadata if available
         from mlvern.utils.dataset_utils import load_dataset_metadata
+
         metadata = load_dataset_metadata(dataset_path)
 
         return {
@@ -682,9 +675,7 @@ class Forge:
         """Train a model and create a run record."""
         from mlvern.utils.environment import save_environment
 
-        model, metrics = train_model(
-            model, X_train, y_train, X_val, y_val
-        )
+        model, metrics = train_model(model, X_train, y_train, X_val, y_val)
 
         run_id = create_run(
             self.mlvern_dir,

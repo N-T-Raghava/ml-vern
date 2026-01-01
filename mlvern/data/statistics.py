@@ -34,11 +34,17 @@ def _mutual_info_series(x: pd.Series, y: pd.Series, bins: int = 10) -> float:
             pass
 
     # Fallback: discretize and compute empirical MI
-    x_disc = pd.cut(x.fillna("__NA__"), bins=bins, labels=False) \
-        if pd.api.types.is_numeric_dtype(x) else x.fillna("__NA__").astype(str)
+    x_disc = (
+        pd.cut(x.fillna("__NA__"), bins=bins, labels=False)
+        if pd.api.types.is_numeric_dtype(x)
+        else x.fillna("__NA__").astype(str)
+    )
 
-    y_disc = pd.cut(y.fillna("__NA__"), bins=bins, labels=False) \
-        if pd.api.types.is_numeric_dtype(y) else y.fillna("__NA__").astype(str)
+    y_disc = (
+        pd.cut(y.fillna("__NA__"), bins=bins, labels=False)
+        if pd.api.types.is_numeric_dtype(y)
+        else y.fillna("__NA__").astype(str)
+    )
 
     x_vals, x_counts = np.unique(x_disc, return_counts=True)
     y_vals, y_counts = np.unique(y_disc, return_counts=True)
@@ -61,8 +67,9 @@ def _mutual_info_series(x: pd.Series, y: pd.Series, bins: int = 10) -> float:
     return float(mi)
 
 
-def numeric_summary(df: pd.DataFrame,
-                    cols: Optional[List[str]] = None) -> Dict[str, Dict[str, Any]]:
+def numeric_summary(
+    df: pd.DataFrame, cols: Optional[List[str]] = None
+) -> Dict[str, Dict[str, Any]]:
     """Compute mean, median, std, skewness for numeric columns."""
     if cols is None:
         numeric_cols = df.select_dtypes(include="number").columns.tolist()
@@ -110,7 +117,7 @@ def correlations(df: pd.DataFrame, method: str = "pearson") -> pd.DataFrame:
 
 
 def feature_target_association(df: pd.DataFrame, target: str) -> Dict[str, Any]:
-    """Compute associations between features and target (correlation + mutual info)."""
+
     out: Dict[str, Any] = {}
     if target not in df.columns:
         return {"error": f"Target '{target}' not in dataframe"}
@@ -122,9 +129,8 @@ def feature_target_association(df: pd.DataFrame, target: str) -> Dict[str, Any]:
         except Exception:
             mi = 0.0
         corr = None
-        if (
-            pd.api.types.is_numeric_dtype(df[col])
-            and pd.api.types.is_numeric_dtype(df[target])
+        if pd.api.types.is_numeric_dtype(df[col]) and pd.api.types.is_numeric_dtype(
+            df[target]
         ):
             corr = float(df[col].corr(df[target]))
         out[col] = {"mutual_info": float(mi), "correlation": corr}
@@ -144,7 +150,8 @@ def hypothesis_test_two_samples(x: pd.Series, y: pd.Series) -> Dict[str, Any]:
 def vif(df: pd.DataFrame, cols: Optional[List[str]] = None) -> Dict[str, float]:
     """Compute Variance Inflation Factor for numeric features.
 
-    Uses linear regression via numpy to compute R^2 for each feature against others.
+    Uses linear regression via numpy to compute R^2 for each
+    feature against others.
     """
     if cols is None:
         numeric = df.select_dtypes(include="number").dropna()
@@ -173,7 +180,7 @@ def vif(df: pd.DataFrame, cols: Optional[List[str]] = None) -> Dict[str, float]:
         ss_tot = ((y - y.mean()) ** 2).sum()
         r2 = 0.0 if ss_tot == 0 else 1 - ss_res / ss_tot
         if r2 >= 1.0:
-            vifs[col] = float('inf')
+            vifs[col] = float("inf")
         else:
             vifs[col] = float(1.0 / (1.0 - r2))
     return vifs
@@ -217,9 +224,7 @@ def interaction_patterns(
     return {"interactions": []}
 
 
-def dimensionality_signals(
-    df: pd.DataFrame, n_components: int = 5
-) -> Dict[str, Any]:
+def dimensionality_signals(df: pd.DataFrame, n_components: int = 5) -> Dict[str, Any]:
     num = df.select_dtypes(include="number").dropna()
     if num.shape[0] == 0:
         return {"status": "no_numeric_data"}
@@ -228,12 +233,8 @@ def dimensionality_signals(
     Xc = X - X.mean(axis=0)
     try:
         U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
-        explained = (S ** 2) / (S ** 2).sum()
-        return {
-            "explained_variance_ratio": (
-                explained[:n_components].tolist()
-            )
-        }
+        explained = (S**2) / (S**2).sum()
+        return {"explained_variance_ratio": (explained[:n_components].tolist())}
     except np.linalg.LinAlgError:
         return {"status": "svd_failed"}
 
@@ -248,16 +249,16 @@ def compute_statistics(
     stats_report: Dict[str, Any] = {}
     stats_report["numeric_summary"] = numeric_summary(df)
     stats_report["distribution_shapes"] = {
-        c: distribution_shape(df, c)
-        for c in df.select_dtypes(include="number").columns
+        c: distribution_shape(df, c) for c in df.select_dtypes(include="number").columns
     }
-    stats_report["correlations_pearson"] = correlations(df,
-                                                        method="pearson").to_dict()
-    stats_report["correlations_spearman"] = correlations(df,
-                                                         method="spearman").to_dict()
+    stats_report["correlations_pearson"] = correlations(df, method="pearson").to_dict()
+    stats_report["correlations_spearman"] = correlations(
+        df, method="spearman"
+    ).to_dict()
     if target is not None:
         stats_report["feature_target_association"] = feature_target_association(
-                                                        df, target)
+            df, target
+        )
     stats_report["vif"] = vif(df)
     stats_report["redundant_features"] = redundant_features(df)
     stats_report["interaction_patterns"] = interaction_patterns(df, target)
