@@ -53,10 +53,8 @@ def test_full_inspection_explicit_skip_status():
     report = inspector.inspect()
 
     # numeric_ranges should be skipped
-    assert report["part_1_profiling"]["numeric_ranges"]["status"] == \
-        "skipped"
+    assert report["part_1_profiling"]["numeric_ranges"]["status"] == "skipped"
     # outliers should be skipped
     assert report["part_1_profiling"]["outliers"]["status"] == "skipped"
     # leakage check should be skipped
-    assert report["part_2_validation"]["leakage_checks"]["status"] == \
-        "skipped"
+    assert report["part_2_validation"]["leakage_checks"]["status"] == "skipped"
