@@ -35,8 +35,14 @@ jobs:
 
     - name: Generate coverage report
       run: |
-        pip install pytest-cov
+        pip install pytest-cov coveralls
         pytest tests/ --cov=mlvern --cov-report=xml --cov-report=term
+
+    - name: Upload coverage to Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: |
+        coveralls
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -69,9 +75,8 @@ jobs:
     - name: Lint with flake8
       run: flake8 mlvern/ tests/ --max-line-length=88
 
-
   build:
-    needs: [test, lint]
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -108,7 +113,7 @@ jobs:
         python-version: "3.10"
 
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-art-artifact@v4
       with:
         name: dist
         path: dist/
