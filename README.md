@@ -1,7 +1,8 @@
 # mlvern
 
 [![Documentation Status](http://readthedocs.org/projects/auto-ml/badge/?version=latest)](http://auto-ml.readthedocs.io/en/latest/?badge=latest)
-[![PyPI version](https://badge.fury.io/py/mlvern.svg)](https://badge.fury.io/py/mlvern)
+[![PyPI Version](https://img.shields.io/pypi/v/mlvern)](https://pypi.org/project/mlvern/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/mlvern)](https://pypi.org/project/mlvern/)
 [![Coverage Status](https://coveralls.io/repos/github/N-T-Raghava/ml-vern/badge.svg?branch=main)](https://coveralls.io/github/N-T-Raghava/ml-vern?branch=main)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]((https://img.shields.io/github/license/mashape/apistatus.svg))
 
