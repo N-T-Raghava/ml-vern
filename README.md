@@ -2,6 +2,7 @@
 
 [![Documentation Status](http://readthedocs.org/projects/auto-ml/badge/?version=latest)](http://auto-ml.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/mlvern.svg)](https://badge.fury.io/py/mlvern)
+[![Coverage Status](https://coveralls.io/repos/github/N-T-Raghava/ml-vern/badge.svg?branch=main)](https://coveralls.io/github/N-T-Raghava/ml-vern?branch=main)
 
 mlvern is a lightweight Python framework for building reproducible and well-organized machine learning workflows. It provides clear tooling for dataset management, experiment tracking, model versioning, and evaluation reporting.
 
