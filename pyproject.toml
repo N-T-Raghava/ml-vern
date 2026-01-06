@@ -4,12 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlvern"
-version = "0.1.8"
-description = """This version introduces automated data inspection, validation checks, 
-and an extensive EDA module that generates structured reports and organized 
-visualizations. The goal of this release is to establish a solid, industry-aligned 
-foundation for reliable data quality assessment and exploratory analysis before 
-model training."""
+version = "0.2.0"
+description = """mlvern v0.2.0, This Enhanced ML Workflow Framework with a better API, 
+Model Registry, and Comprehensive Experiment Management. This release introduces 
+expanded API functions for dataset management, model versioning, run tagging and 
+search capabilities, comprehensive evaluation tools, and project analytics. 
+Features include full run lifecycle management, intelligent dataset pruning, 
+advanced data quality assessment, EDA automation, and production-ready inference pipelines. 
+Designed for reproducible, well-organized machine learning workflows with 
+industry-aligned data validation and risk assessment."""
 authors = [{name="Tanmai Raghava"}]
 readme = "README.md"
 requires-python = ">=3.9"

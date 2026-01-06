@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('../../mlvern'))
 project = u'mlvern'
 copyright = u'2025, Tanmai Raghava'
 author = 'Tanmai Raghava'
-release = '0.1.8'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
