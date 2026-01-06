@@ -40,13 +40,11 @@ jobs:
 
     - name: Upload coverage to Coveralls
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         COVERALLS_SERVICE_NAME: github-actions
-      # Use the GitHub Actions service name so coveralls-python uses the repo token
-      # instead of expecting GITHUB_TOKEN.
-      # See: https://coveralls-python.readthedocs.io/en/latest/usage/configuration.html#github-actions-support
       run: |
-        coveralls
+        coveralls --service=github-actions
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
