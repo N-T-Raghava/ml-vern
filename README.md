@@ -2,12 +2,13 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/mlvern)](https://pypi.org/project/mlvern/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/mlvern)](https://pypi.org/project/mlvern/)
-[![Documentation Status](http://readthedocs.org/projects/auto-ml/badge/?version=latest)](http://auto-ml.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](http://readthedocs.org/projects/ml-vern/badge/?version=latest)](http://ml-vern.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/N-T-Raghava/ml-vern/test.yml)](https://github.com/<username>/ml-vern/actions)
 [![Coverage Status](https://coveralls.io/repos/github/N-T-Raghava/ml-vern/badge.svg?branch=main)](https://coveralls.io/github/N-T-Raghava/ml-vern?branch=main)
 [![codecov](https://codecov.io/gh/N-T-Raghava/ml-vern/graph/badge.svg?token=KZIEXD9ALC)](https://codecov.io/gh/N-T-Raghava/ml-vern)
 [![Type Checked](https://img.shields.io/badge/mypy-checked-blue)](https://github.com/python/mypy)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000)](https://github.com/psf/black)
+[![Security: Bandit](https://img.shields.io/badge/security-bandit-yellow)](https://github.com/PyCQA/bandit)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]((https://img.shields.io/github/license/mashape/apistatus.svg))
 
 mlvern is a lightweight Python framework for building reproducible and well-organized machine learning workflows. It provides clear tooling for dataset management, experiment tracking, model versioning, and evaluation reporting.
