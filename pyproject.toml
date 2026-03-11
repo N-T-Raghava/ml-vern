@@ -10,7 +10,10 @@ and an extensive EDA module that generates structured reports and organized
 visualizations. The goal of this release is to establish a solid, industry-aligned 
 foundation for reliable data quality assessment and exploratory analysis before 
 model training."""
-authors = [{name="Tanmai Raghava"}]
+authors = [
+    { name = "Tanmai Raghava", email = "tanmairaghav3836@gmail.com" }
+]
+
 readme = "README.md"
 requires-python = ">=3.9"
 
@@ -46,3 +49,7 @@ line-length = 88
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[project.urls]
+Homepage = "https://ml-vern.readthedocs.io/en/stable/"
+Repository = "https://github.com/N-T-Raghava/ml-vern"
