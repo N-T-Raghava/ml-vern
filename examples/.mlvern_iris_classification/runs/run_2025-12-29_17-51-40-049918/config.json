@@ -1,0 +1,6 @@
+{
+    "model_type": "LogisticRegression",
+    "max_iter": 200,
+    "solver": "lbfgs",
+    "random_state": 42
+}

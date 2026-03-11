@@ -1,0 +1,1 @@
+"""Training module test suite."""

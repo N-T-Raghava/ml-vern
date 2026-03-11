@@ -13,8 +13,12 @@ def _ensure_dir(path: str):
     os.makedirs(path, exist_ok=True)
 
 
-def basic_eda(df: pd.DataFrame, output_dir: str,
-              mlvern_dir: Optional[str] = None, target: Optional[str] = None):
+def basic_eda(
+    df: pd.DataFrame,
+    output_dir: str,
+    mlvern_dir: Optional[str] = None,
+    target: Optional[str] = None,
+):
 
     resolved_mlvern_dir = mlvern_dir
     if not resolved_mlvern_dir or not os.path.isdir(resolved_mlvern_dir):
@@ -74,7 +78,12 @@ def basic_eda(df: pd.DataFrame, output_dir: str,
         corr_dir = os.path.join(output_dir, "correlation")
         _ensure_dir(corr_dir)
         corr = df[numeric_cols].corr()
-        plt.figure(figsize=(max(6, len(numeric_cols) * 0.5), max(4, len(numeric_cols) * 0.4)))
+        plt.figure(
+            figsize=(
+                max(6, len(numeric_cols) * 0.5),
+                max(4, len(numeric_cols) * 0.4),
+            )
+        )
         im = plt.imshow(corr, cmap="coolwarm", vmin=-1, vmax=1)
         plt.colorbar(im)
         plt.xticks(range(len(numeric_cols)), numeric_cols, rotation=90)
@@ -102,7 +111,9 @@ def basic_eda(df: pd.DataFrame, output_dir: str,
             else:
                 # boxplot grouped by target
                 try:
-                    groups = [group.dropna().values for _, group in df.groupby(target)[col]]
+                    groups = [
+                        group.dropna().values for _, group in df.groupby(target)[col]
+                    ]
                     plt.boxplot(groups)
                     plt.xticks(range(1, len(groups) + 1), df[target].unique())
                     plt.title(f"{col} by {target}")
@@ -117,7 +128,8 @@ def basic_eda(df: pd.DataFrame, output_dir: str,
     # Missingness map
     missing_dir = os.path.join(output_dir, "missingness")
     _ensure_dir(missing_dir)
-    # Skip the full missingness heatmap for empty data to avoid matplotlib warnings
+    # Skip the full missingness heatmap for empty data
+    # to avoid matplotlib warnings
     if df.shape[0] == 0 or df.shape[1] == 0:
         # create a small placeholder image indicating no data
         plt.figure(figsize=(4, 2))
@@ -131,9 +143,14 @@ def basic_eda(df: pd.DataFrame, output_dir: str,
         plt.figure(figsize=(10, max(2, df.shape[0] * 0.01)))
         # visual binary map of missingness
         try:
-            plt.imshow(df.isnull().T, aspect='auto', cmap='Greys', interpolation='nearest')
+            plt.imshow(
+                df.isnull().T,
+                aspect="auto",
+                cmap="Greys",
+                interpolation="nearest",
+            )
             plt.yticks(range(len(df.columns)), df.columns)
-            plt.title('Missingness map (columns y-axis)')
+            plt.title("Missingness map (columns y-axis)")
             p_miss = os.path.join(missing_dir, "missingness_map.png")
             plt.tight_layout()
             plt.savefig(p_miss)
@@ -142,7 +159,8 @@ def basic_eda(df: pd.DataFrame, output_dir: str,
         except Exception:
             plt.close()
 
-    # Write a small JSON report into mlvern reports dir if resolved_mlvern_dir provided
+    # Write JSON report into mlvern reports dir if
+    # resolved_mlvern_dir provided
     if resolved_mlvern_dir is not None:
         reports_dir = os.path.join(resolved_mlvern_dir, "reports")
         _ensure_dir(reports_dir)

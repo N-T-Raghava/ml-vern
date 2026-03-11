@@ -1,0 +1,11 @@
+{
+    "class_imbalance": {
+        "counts": {
+            "0": 50,
+            "1": 50,
+            "2": 50
+        },
+        "imbalance_ratio": 1.0
+    },
+    "target_leakage": {}
+}

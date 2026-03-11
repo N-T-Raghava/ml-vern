@@ -1,0 +1,6 @@
+{
+    "model_type": "RandomForestClassifier",
+    "n_estimators": 50,
+    "max_depth": 10,
+    "random_state": 42
+}

@@ -10,10 +10,7 @@ and an extensive EDA module that generates structured reports and organized
 visualizations. The goal of this release is to establish a solid, industry-aligned 
 foundation for reliable data quality assessment and exploratory analysis before 
 model training."""
-authors = [
-    { name = "Tanmai Raghava", email = "tanmairaghav3836@gmail.com" }
-]
-
+authors = [{name="Tanmai Raghava"}]
 readme = "README.md"
 requires-python = ">=3.9"
 
@@ -27,6 +24,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    "coveralls",
+    "docopt",
     "pytest-cov>=4.0",
     "black>=22.0",
     "isort>=5.0",
@@ -46,6 +45,10 @@ line_length = 88
 
 [tool.black]
 line-length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
 
 [tool.setuptools.packages.find]
 where = ["."]

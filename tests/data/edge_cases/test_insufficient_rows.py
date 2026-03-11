@@ -42,11 +42,12 @@ def test_outliers_available_five_rows():
     df = pd.DataFrame({"a": [1, 2, 3, 4, 5]})
     inspector = DataInspector(df)
     result = inspector._profile_outliers()
-    assert "status" not in result  # Should be data dict or empty dict, not skip status
+    assert "status" not in result  # Data dict or empty, not skip
 
 
 def test_full_inspection_explicit_skip_status():
-    """Full inspection on single-row df should include skip status in report."""
+    """Full inspection on single-row df should
+    include skip status in report."""
     df = pd.DataFrame({"x": [1.0], "target": [0]})
     inspector = DataInspector(df, target="target")
     report = inspector.inspect()
