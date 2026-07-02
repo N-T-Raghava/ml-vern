@@ -11,51 +11,59 @@
 [![Security: Bandit](https://img.shields.io/badge/security-bandit-yellow)](https://github.com/PyCQA/bandit)
 [![License](https://img.shields.io/github/license/N-T-Raghava/ml-vern)](LICENSE)
 
-mlvern is a lightweight Python framework for building reproducible and well-organized machine learning workflows. It provides clear tooling for dataset management, experiment tracking, model versioning, and evaluation reporting.
+mlvern is a Python library for structuring machine learning workflows with consistent dataset handling, experiment tracking, and model management.
 
-Project documentation: https://ml-vern.readthedocs.io/en/latest/
-
----
-
-## Purpose
-
-Machine learning projects often become difficult to maintain due to scattered datasets, untracked experiments, and inconsistent model artifacts. mlvern addresses these problems by offering a simple and deterministic project structure where heavy data inspection and analysis are performed only once per unique dataset fingerprint.
-
-The framework is suitable for:
-- Individual ML practitioners
-- Research prototyping
-- Academic projects
-- Small to medium ML teams
+It provides a lightweight framework to organize ML projects by separating data processing, experimentation, and evaluation into reproducible units.
 
 ---
 
-## Core Capabilities
+## Documentation
 
-- Dataset registration and fingerprinting  
-- Persistent metadata storage  
-- Automated exploratory data analysis  
-- Experiment run management  
-- Model artifact registry  
-- Standardized prediction interface  
-- Evaluation and metric comparison  
-- Cleanup and pruning utilities  
+https://ml-vern.readthedocs.io/en/latest/
+
+## Key Features
+
+- Dataset registration with fingerprint-based identification  
+- Metadata tracking for datasets and experiments  
+- Structured experiment execution workflow  
+- Model artifact storage and retrieval  
+- Evaluation tracking and comparison across runs  
+- Simple prediction interface for trained models  
+- Utilities for dataset inspection and validation  
 
 ---
 
-## Development Philosophy
+## Design Goals
 
-mlvern follows these principles:
+mlvern is built around the following principles:
 
-- Deterministic dataset fingerprinting
-- One-time heavy data inspection
-- Minimal and explicit APIs
-- Clear artifact organization
-- Easy comparison between runs
-- Simple prediction and evaluation helpers
+- Reproducibility: identical inputs produce identical tracked outputs  
+- Traceability: datasets, experiments, and models are versioned and linked  
+- Simplicity: minimal API surface with explicit behavior  
+- Separation of concerns: data, training, and evaluation are decoupled  
+- Lightweight structure: avoids unnecessary abstraction layers  
+
+---
 
 ## Installation
 
-Install the latest stable version from PyPI:
-
 ```bash
 pip install mlvern
+```
+
+## Quick Usage
+
+```python
+from mlvern import Forge
+
+forge = Forge("your_project", "your_base_dir")
+forge.init()
+dataset_fp, _ = forge.register_dataset(df, "target")
+run_id, metrics = forge.run(model, X_train, y_train, X_val, y_val, config, dataset_fp)
+
+from mlvern import ModelComparator
+ModelComparator(forge).compare_models([run_id])
+```
+
+## Requirements
+Python 3.8+, NumPy, Pandas
